@@ -3,13 +3,13 @@ import { supabase } from '../../services/client';
 import { Box, Grid, Container, Typography, Avatar, BottomNavigation, BottomNavigationAction, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import EventAdmin from './eventos/EventAdmin';
-// import BusinessCard from '../cards/Business';
-// import img from '../../assets/images/img107.jpg'
+import logo from '../../assets/images/logoWL.png'
 import Categories from './catalogo/CatalogoComp';
 import NovedadesTab from './novedades/NovedadesTab';
 import BusinessDataAdmin from './negocio/BusinessDataAdmin';
 import LoadingAnimation from '../utils/LoadingAnimation';
 import BusinessDetails from './dashboard/BusinessDetails';
+import { width } from '@mui/system';
 
 
 const StyledBottomNavigation = styled(BottomNavigation)({
@@ -36,8 +36,6 @@ const BusinessProfile = () => {
 
   useEffect(() => {
     const fetchBusiness = async () => {
-      // Aquí debes hacer una solicitud a tu base de datos para obtener los negocios asociados al perfil del usuario
-      // Puedes usar supabase para hacer la solicitud
       const { data, error } = await supabase
         .from('business')
         .select('*')
@@ -47,14 +45,11 @@ const BusinessProfile = () => {
       } else {
         setBusiness(data[0]);
         console.log(data[0])
+        setCurrentComponent(<BusinessDetails business={data[0]} />); // Usa data[0] en lugar de business
       }
     };
     fetchBusiness();
   }, []);
-
-  const handleCreateBusiness = () => {
-    // Aquí debes implementar la lógica para crear un nuevo negocio
-  };
 
   const handleChange = (event, newValue) => {
     if (!business) {
@@ -82,21 +77,17 @@ const BusinessProfile = () => {
         setCurrentComponent(<NovedadesTab business={business}></NovedadesTab>)
         break;
       default:
-        setCurrentComponent(<BusinessCard business={{
-          coverImageUrl: img,
-          profileImageUrl: img,
-          businessName: 'Nombre del negocio'
-        }} />);
+        setCurrentComponent(<BusinessDetails business={business} />);
     }
   };
 
   return (
     <Box sx={{ marginTop: 0 }}>
       <Box width="100%" sx={{ flexGrow: 1 }}>
-        <Box sx={{ p: 2, backgroundColor: '#555', color: '#fff', display: 'flex', alignItems: 'center' }}>
-          <Avatar sx={{ bgcolor: 'secondary.main' }}>Logo</Avatar>
+        <Box sx={{ p: 2, pb:1, backgroundColor: '#555', color: '#fff', display: 'flex', alignItems: 'center' }}>
+          <img src={logo} style={{width:'150px'}}/>
           <Box sx={{ flexGrow: 1 }} />
-          <Avatar sx={{ bgcolor: 'secondary.main' }} src={business ? business.photo_perfil + '?t=' + Date.now() : ''}></Avatar>
+          <Avatar sx={{ bgcolor: 'secondary.main' }} src={business ? business.photo_perfil : ''}></Avatar>
           <Box sx={{ ml: 2 }}>
             <Typography variant="h6">{business?.name}</Typography>
             <Typography variant="body2">Plan Premium</Typography>

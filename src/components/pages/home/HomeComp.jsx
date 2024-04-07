@@ -5,7 +5,7 @@ import ProvinceSelected from '../../utils/ProvinceSelected'; // Asegúrate de qu
 import { supabase } from '../../../services/client';
 import ProductCard from '../../cards/Products';
 import BusinessCard from '../../cards/Business';
-// import Category from '../../adminPanel/catalogo/Category';
+import Category from '../../adminPanel/catalogo/Category';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { Carousel } from 'react-responsive-carousel';
@@ -110,17 +110,17 @@ const HomeComp = () => {
       </Box>
 
       <Typography variant="h5" >Categories</Typography>
-      {/* <Carousel showThumbs={false} showIndicators={false} centerMode centerSlidePercentage={isMobile ? 26 : 7} >
+      <Carousel showThumbs={false} centerMode centerSlidePercentage={isMobile ? 26 : 7}  emulateTouch infiniteLoop showArrows={false} showStatus={false} showIndicators={false}>
         {categories.map((category) => (
           <div key={category.id}>
             <Category categoryName={category.nameProduct} />
           </div>
         ))}
-      </Carousel> */}
+      </Carousel>
 
       <Typography variant="h5">Products</Typography>
       <Box sx={{ maxWidth: '100%' }}>
-        <Carousel showThumbs={false} showIndicators={false} centerMode centerSlidePercentage={isMobile ? 80 : 20}>
+        <Carousel showThumbs={false} centerMode centerSlidePercentage={isMobile ? 80 : 20} emulateTouch infiniteLoop showArrows={false} showStatus={false} showIndicators={false}>
           {products.map((product) => (
             <Box m={2} key={product.id}>
               <ProductCard product={product} addToCart={addToCart} />
@@ -131,7 +131,7 @@ const HomeComp = () => {
 
       <Typography variant="h5">Businesses</Typography>
       <Box sx={{ maxWidth: '100%' }}>
-        <Carousel showThumbs={false} showIndicators={false} centerMode centerSlidePercentage={isMobile ? 87 : 35}>
+        <Carousel showThumbs={false} centerMode centerSlidePercentage={isMobile ? 87 : 35} emulateTouch infiniteLoop showArrows={false} showStatus={false} showIndicators={false}>
           {businesses.map((business) => (
             <Box m={2} key={business.id}>
               <BusinessCard business={business} />
