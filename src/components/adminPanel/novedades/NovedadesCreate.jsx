@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Box, Avatar, Button, TextField } from '@mui/material';
 
-const CreatePostCard = ({ onCreatePost }) => {
+const CreatePostCard = ({ onCreatePost, image }) => {
     const [postContent, setPostContent] = useState('');
 
     const handlePostContentChange = (event) => {
@@ -17,7 +17,7 @@ const CreatePostCard = ({ onCreatePost }) => {
         <Card sx={{ p: 2, borderRadius: '20px', boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.3)' }}>
             <Box display={'flex'} gap={'10px'}>
                 <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
-                    <Avatar src={''} />
+                    <Avatar src={image} />
                 </Box>
                 <Box mb={2}>
                     <TextField

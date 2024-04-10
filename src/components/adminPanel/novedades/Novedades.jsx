@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Box, Avatar, Button, Typography } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-const PostCard = ({ post, onDeletePost }) => {
+const PostCard = ({ post, onDeletePost, image }) => {
     const { avatarSrc, negocioNombre, contenido, onEditarClick, onEliminarClick } = post;
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -20,7 +20,7 @@ const PostCard = ({ post, onDeletePost }) => {
         <Card sx={{ p: 2, width: '300px', overflowX: 'hidden', borderRadius: '20px', boxShadow: '0px 1px 10px rgba(0, 0, 0, 0.3)' }}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box display="flex" alignItems="center">
-                    <Avatar src={avatarSrc} />
+                    <Avatar src={image} />
                     <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'black', mr: 1, ml:1 }}>
                         {negocioNombre}
                     </Typography>

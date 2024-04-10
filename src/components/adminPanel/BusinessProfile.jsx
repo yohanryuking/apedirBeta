@@ -9,7 +9,7 @@ import NovedadesTab from './novedades/NovedadesTab';
 import BusinessDataAdmin from './negocio/BusinessDataAdmin';
 import LoadingAnimation from '../utils/LoadingAnimation';
 import BusinessDetails from './dashboard/BusinessDetails';
-import { width } from '@mui/system';
+import { useNavigate } from 'react-router-dom';
 
 
 const StyledBottomNavigation = styled(BottomNavigation)({
@@ -31,8 +31,7 @@ const StyledBottomNavigationAction = styled(BottomNavigationAction)({
 const BusinessProfile = () => {
   const [value, setValue] = React.useState(0);
   const [business, setBusiness] = useState(null);
-
-  const [currentComponent, setCurrentComponent] = useState(<></>); // Estado para el componente actual
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBusiness = async () => {
@@ -44,8 +43,6 @@ const BusinessProfile = () => {
         console.error('Error fetching business:', error.message);
       } else {
         setBusiness(data[0]);
-        console.log(data[0])
-        setCurrentComponent(<BusinessDetails business={data[0]} />); // Usa data[0] en lugar de business
       }
     };
     fetchBusiness();
@@ -58,34 +55,13 @@ const BusinessProfile = () => {
     }
 
     setValue(newValue);
-
-
-    switch (newValue) {
-      case 0:
-        setCurrentComponent(<BusinessDetails business={business} />);
-        break;
-      case 1:
-        setCurrentComponent(<BusinessDataAdmin business={business} />);
-        break;
-      case 2:
-        setCurrentComponent(<Categories business={business} />);
-        break;
-      case 3:
-        setCurrentComponent(<EventAdmin business={business} />);
-        break;
-      case 4:
-        setCurrentComponent(<NovedadesTab business={business}></NovedadesTab>)
-        break;
-      default:
-        setCurrentComponent(<BusinessDetails business={business} />);
-    }
   };
 
   return (
     <Box sx={{ marginTop: 0 }}>
       <Box width="100%" sx={{ flexGrow: 1 }}>
-        <Box sx={{ p: 2, pb:1, backgroundColor: '#555', color: '#fff', display: 'flex', alignItems: 'center' }}>
-          <img src={logo} style={{width:'150px'}}/>
+        <Box sx={{ p: 2, pb: 1, backgroundColor: '#555', color: '#fff', display: 'flex', alignItems: 'center' }}>
+          <img src={logo} style={{ width: '150px' }} onClick={() => navigate('/')} />
           <Box sx={{ flexGrow: 1 }} />
           <Avatar sx={{ bgcolor: 'secondary.main' }} src={business ? business.photo_perfil : ''}></Avatar>
           <Box sx={{ ml: 2 }}>
@@ -101,7 +77,17 @@ const BusinessProfile = () => {
           <StyledBottomNavigationAction label="Novedades" />
         </StyledBottomNavigation>
         <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', marginTop: '20px' }}>
-          {business ? currentComponent : <LoadingAnimation />}
+          {business ? (
+            <>
+              <div style={{ display: value === 0 ? 'block' : 'none' }}><BusinessDetails business={business} /></div>
+              <div style={{ display: value === 1 ? 'block' : 'none' }}><BusinessDataAdmin business={business} /></div>
+              <div style={{ display: value === 2 ? 'block' : 'none' }}><Categories business={business} /></div>
+              <div style={{ display: value === 3 ? 'block' : 'none' }}><EventAdmin business={business} /></div>
+              <div style={{ display: value === 4 ? 'block' : 'none' }}><NovedadesTab business={business} /></div>
+            </>
+          ) : (
+            <LoadingAnimation />
+          )}
         </Box>
       </Box>
     </Box>

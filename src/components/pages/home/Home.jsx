@@ -50,32 +50,18 @@ const Home = () => {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
-
-    switch (newValue) {
-      case 0:
-        setCurrentComponent(<HomeComp />);
-        break;
-      case 1:
-        setCurrentComponent(<Calendar />);
-        break;
-      case 2:
-        setCurrentComponent(<Cart />);
-        break;
-      case 3:
-        setCurrentComponent(<Announcements />);
-        break;
-      case 4:
-        navigate('/profile')
-        break;
-      default:
-        setCurrentComponent(<HomeComp />);
-    }
   };
 
   // Renderizar el componente
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingBottom: '75px' }}>
-      <Box sx={{ width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>{currentComponent}</Box>
+      <Box sx={{ width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ display: value === 0 ? 'block' : 'none' }}><HomeComp /></div>
+        <div style={{ display: value === 1 ? 'block' : 'none' }}><Calendar /></div>
+        <div style={{ display: value === 2 ? 'block' : 'none' }}><Cart /></div>
+        <div style={{ display: value === 3 ? 'block' : 'none' }}><Announcements /></div>
+        {value === 4 && navigate('/profile')}
+      </Box>
       <BottomNavigation value={value} onChange={handleChange} sx={{ width: '90%', position: 'fixed', bottom: 15, borderRadius: '30px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)' }}>
         <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<HomeIcon style={{ fontSize: isMobile ? '2em' : '2.5em', color: value === 0 ? 'purple' : 'black' }} />} />
         <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<CalendarTodayIcon style={{ fontSize: isMobile ? '2em' : '2.5em', color: value === 1 ? 'purple' : 'black' }} />} />

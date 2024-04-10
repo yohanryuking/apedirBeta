@@ -109,7 +109,7 @@ const HomeComp = () => {
         <SearchBar onSearch={handleSearch} />
       </Box>
 
-      <Typography variant="h5" >Categories</Typography>
+      <Typography variant="h5" >Categorias</Typography>
       <Carousel showThumbs={false} centerMode centerSlidePercentage={isMobile ? 26 : 7}  emulateTouch infiniteLoop showArrows={false} showStatus={false} showIndicators={false}>
         {categories.map((category) => (
           <div key={category.id}>
@@ -118,7 +118,7 @@ const HomeComp = () => {
         ))}
       </Carousel>
 
-      <Typography variant="h5">Products</Typography>
+      <Typography variant="h5">Recomendados</Typography>
       <Box sx={{ maxWidth: '100%' }}>
         <Carousel showThumbs={false} centerMode centerSlidePercentage={isMobile ? 80 : 20} emulateTouch infiniteLoop showArrows={false} showStatus={false} showIndicators={false}>
           {products.map((product) => (
@@ -129,7 +129,7 @@ const HomeComp = () => {
         </Carousel>
       </Box>
 
-      <Typography variant="h5">Businesses</Typography>
+      <Typography variant="h5">Negocios</Typography>
       <Box sx={{ maxWidth: '100%' }}>
         <Carousel showThumbs={false} centerMode centerSlidePercentage={isMobile ? 87 : 35} emulateTouch infiniteLoop showArrows={false} showStatus={false} showIndicators={false}>
           {businesses.map((business) => (

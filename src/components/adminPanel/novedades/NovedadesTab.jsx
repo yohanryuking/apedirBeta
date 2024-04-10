@@ -10,7 +10,7 @@ const NovedadesTab = ({business}) => {
     const fetchPosts = async () => {
         const { data, error } = await supabase
             .from('posts')
-            .select('*')
+            .select('*').eq('negocioNombre', business.name)
             .order('id', { ascending: false });
         if (error) {
             console.error('Error fetching posts:', error.message);
@@ -47,10 +47,10 @@ const NovedadesTab = ({business}) => {
 
     return (
         <Box>
-            <CreatePostCard onCreatePost={handleCreatePost} />
+            <CreatePostCard onCreatePost={handleCreatePost} image={business.photo_perfil}/>
             {posts.map((post) => (
                 <Box key={post.id} sx={{ mt: 2 }}>
-                    <PostCard post={post} onDeletePost={handleDeletePost} />
+                    <PostCard post={post} onDeletePost={handleDeletePost} image={business?.photo_perfil} />
                 </Box>
             ))}
         </Box>

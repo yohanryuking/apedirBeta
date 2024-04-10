@@ -9,6 +9,7 @@ import Verification from './components/pages/Verification';
 import Home from './components/pages/home/Home';
 import PersonalProfile from './components/pages/home/PersonalProfile';
 import BusinesNotFound from './components/adminPanel/BusinesNotFound';
+import ProductPage from './components/pages/particularPages/ProductPage';
 import './App.css'
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <Route path="/verification" element={<Verification />} />
         <Route path="/profile" element={<PersonalProfile />} />
         <Route path="/profile/business" element={<BusinesNotFound />} />
+        <Route path="/product/:id" element={<ProductPage/>}/>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

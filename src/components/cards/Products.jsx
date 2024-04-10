@@ -24,7 +24,7 @@ const ProductCard = ({ product, addToCart }) => {
             <IconButton onClick={handleAddToCart} style={{ position: 'absolute', top: 10, right: 10, backgroundColor: 'rgba(260, 260, 260, 0.5)', borderRadius: '10px', }}>
                 <FontAwesomeIcon icon={faShoppingCart} style={{ color: 'black' }} />
             </IconButton>
-            <CardContent onClick={() => { navigate('/product') }} style={{ padding: '16px' }}>
+            <CardContent onClick={() => { navigate('/product/'+product.id) }} style={{ padding: '16px' }}>
                 <Box display='flex' alignItems='center' justifyContent='space-between' flexDirection={'row'}>
                     <Typography variant="body1" component="h2">
                         {name}
