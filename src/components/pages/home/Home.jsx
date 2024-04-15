@@ -37,7 +37,7 @@ const Home = () => {
         navigate('/login');
 
       } else {
-        console.log(session.data.session); // Si hay sesión, imprimir el email del usuario
+        // console.log(session.data.session); // Si hay sesión, imprimir el email del usuario
       }
 
       const user = await supabase.auth.getUser(); // Obtener el usuario
@@ -67,7 +67,7 @@ const Home = () => {
         <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<CalendarTodayIcon style={{ fontSize: isMobile ? '2em' : '2.5em', color: value === 1 ? 'purple' : 'black' }} />} />
         <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<ShoppingCartIcon style={{ fontSize: isMobile ? '2em' : '2.5em', color: value === 2 ? 'purple' : 'black' }} />} />
         <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<Campaign style={{ fontSize: isMobile ? '2em' : '2.5em', color: value === 3 ? 'purple' : 'black' }} />} />
-        <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<Avatar src={'https://duerpqsxmxeokygbzexa.supabase.co/storage/v1/object/public/images/' + user + '/avatar.jpg'} style={{ fontSize: isMobile ? '1em' : '1.5em', border: '2px solid purple' }} />} />
+        {/* <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<Avatar src={'https://duerpqsxmxeokygbzexa.supabase.co/storage/v1/object/public/images/' + user + '/avatar.jpg'} style={{ fontSize: isMobile ? '1em' : '1.5em', border: '2px solid purple' }} />} /> */}
       </BottomNavigation>
     </Box>
   );

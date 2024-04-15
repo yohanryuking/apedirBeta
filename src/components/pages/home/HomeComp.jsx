@@ -1,61 +1,71 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, } from '@mui/material';
+import React, { useEffect, useContext, useState } from 'react';
+import { AppContext } from '../../../AppContext'; // Asegúrate de que la ruta sea correcta
+import { Box, Typography, CircularProgress } from '@mui/material';
 import SearchBar from '../../utils/SearchBar'; // Asegúrate de que la ruta sea correcta
-import ProvinceSelected from '../../utils/ProvinceSelected'; // Asegúrate de que la ruta sea correcta
+// import ProvinceSelected from '../../utils/ProvinceSelected'; // Asegúrate de que la ruta sea correcta
 import { supabase } from '../../../services/client';
 import ProductCard from '../../cards/Products';
 import BusinessCard from '../../cards/Business';
 import Category from '../../adminPanel/catalogo/Category';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-import { Carousel } from 'react-responsive-carousel';
-import "react-responsive-carousel/lib/styles/carousel.min.css";
+import Slider from "react-slick";
+import { TroubleshootRounded } from '@mui/icons-material';
 
 
 const HomeComp = () => {
-  const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [businesses, setBusinesses] = useState([]);
+  const { userEmail, userId, products, businesses, cayegoryProducts, isAllDataLoaded,cart,users,categoryBusiness,events,posts } = useContext(AppContext);
   const [selectedProvince, setSelectedProvince] = useState('Todas las provincias');
-  const [userId, setUserId] = useState(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  const getSliderSettings = (slidesToShow,slidesToShow6,slidesToShow48) => ({
+    dots: TroubleshootRounded,
+    infinite: false,
+    speed: 500,
+    slidesToShow: slidesToShow,
+    slidesToScroll: 1,
+    centerMode: false,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: slidesToShow,
+          slidesToScroll: 1,
+          infinite: false,
+          dots: true
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: slidesToShow6,
+          slidesToScroll: 1,
+          initialSlide: 1
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: slidesToShow48,
+          slidesToScroll: 1
+        }
+      }
+    ]
+  });
+
 
   useEffect(() => {
-    const fetchData = async () => {
-      let categories = [];
-      let products = [];
-      let businesses = [];
-
-      if (selectedProvince === 'Todas las provincias') {
-        ({ data: categories } = await supabase.from('cayegoryProducts').select('*'));
-        ({ data: products } = await supabase.from('products').select('*'));
-        ({ data: businesses } = await supabase.from('business').select('*'));
-      } else {
-        ({ data: categories } = await supabase.from('cayegoryProducts').select('*'));
-        ({ data: products } = await supabase.from('products').select('*').filter('provincia', 'eq', selectedProvince));
-        ({ data: businesses } = await supabase.from('business').select('*').filter('provincia', 'eq', selectedProvince));
-      }
-
-      setCategories(categories);
-      console.log(categories)
-      setProducts(products);
+    if (isAllDataLoaded) {
+      console.log(userEmail)
+      console.log(userId)
       console.log(products)
-      setBusinesses(businesses);
       console.log(businesses)
-    };
+      console.log(cayegoryProducts)
+    }
 
-    const fetchUser = async () => {
-      const user = await supabase.auth.getUser();
-      setUserId(user.data.user.id);
-    };
-
-    fetchUser();
-
-    fetchData();
-  }, [selectedProvince]);
+  }, [isAllDataLoaded]);
 
   const addToCart = async (productId) => {
     // Buscar el producto en el carrito de la base de datos
@@ -97,47 +107,55 @@ const HomeComp = () => {
     // Aquí puedes manejar la lógica de búsqueda
   };
 
-  const handleProvinceChange = (event) => {
-    setSelectedProvince(event.target.value);
-    // Aquí puedes manejar la lógica cuando la provincia seleccionada cambia
-  };
+  // const handleProvinceChange = (event) => {
+  //   setSelectedProvince(event.target.value);
+  //   // Aquí puedes manejar la lógica cuando la provincia seleccionada cambia
+  // };
+  if (!isAllDataLoaded) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ padding: '15px', display: 'flex', gap: '15px', flexDirection: 'column', width: '100vw' }}>
       <Box display="flex" justifyContent="space-between" flexDirection={'column'}>
-        <ProvinceSelected value={selectedProvince} onChange={handleProvinceChange} />
+        {/* <ProvinceSelected value={selectedProvince} onChange={handleProvinceChange} /> */}
         <SearchBar onSearch={handleSearch} />
       </Box>
 
       <Typography variant="h5" >Categorias</Typography>
-      <Carousel showThumbs={false} centerMode centerSlidePercentage={isMobile ? 26 : 7}  emulateTouch infiniteLoop showArrows={false} showStatus={false} showIndicators={false}>
-        {categories.map((category) => (
+      <Slider {...getSliderSettings(6,6,4)}>
+        {cayegoryProducts.map((category) => (
           <div key={category.id}>
             <Category categoryName={category.nameProduct} />
           </div>
         ))}
-      </Carousel>
+      </Slider>
 
       <Typography variant="h5">Recomendados</Typography>
       <Box sx={{ maxWidth: '100%' }}>
-        <Carousel showThumbs={false} centerMode centerSlidePercentage={isMobile ? 80 : 20} emulateTouch infiniteLoop showArrows={false} showStatus={false} showIndicators={false}>
+        <Slider {...getSliderSettings(5,2.1,1.3)}>
           {products.map((product) => (
             <Box m={2} key={product.id}>
               <ProductCard product={product} addToCart={addToCart} />
             </Box>
           ))}
-        </Carousel>
+        </Slider>
       </Box>
 
       <Typography variant="h5">Negocios</Typography>
       <Box sx={{ maxWidth: '100%' }}>
-        <Carousel showThumbs={false} centerMode centerSlidePercentage={isMobile ? 87 : 35} emulateTouch infiniteLoop showArrows={false} showStatus={false} showIndicators={false}>
+        <Slider {...getSliderSettings(3,1.3,1)}>
           {businesses.map((business) => (
             <Box m={2} key={business.id}>
               <BusinessCard business={business} />
             </Box>
           ))}
-        </Carousel>
+        </Slider>
+
       </Box>
     </Box>
   );

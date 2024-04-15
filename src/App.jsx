@@ -10,7 +10,10 @@ import Home from './components/pages/home/Home';
 import PersonalProfile from './components/pages/home/PersonalProfile';
 import BusinesNotFound from './components/adminPanel/BusinesNotFound';
 import ProductPage from './components/pages/particularPages/ProductPage';
+import { AppProvider } from './AppContext';
 import './App.css'
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 function App() {
 
@@ -32,17 +35,19 @@ function App() {
 
   return (
     <>
-      <CssBaseline />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verification" element={<Verification />} />
-        <Route path="/profile" element={<PersonalProfile />} />
-        <Route path="/profile/business" element={<BusinesNotFound />} />
-        <Route path="/product/:id" element={<ProductPage/>}/>
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <AppProvider>
+        <CssBaseline />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/verification" element={<Verification />} />
+          <Route path="/profile" element={<PersonalProfile />} />
+          <Route path="/profile/business" element={<BusinesNotFound />} />
+          <Route path="/product/:id" element={<ProductPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AppProvider>
     </>
   )
 }
