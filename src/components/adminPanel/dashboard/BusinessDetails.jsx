@@ -5,18 +5,18 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PersonIcon from '@mui/icons-material/Person';
+import { TroubleshootRounded } from '@mui/icons-material';
 
-import { Carousel } from 'react-responsive-carousel';
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // Importa los estilos del carrusel
+import Slider from "react-slick";
 
 
 const StatBox = ({ title, value, icon, color, deno }) => (
-  <Box sx={{ borderRadius: '20px', padding: '5px', margin: '10px', maxWidth: '300px', background:'#555', color:'white'}}>
+  <Box sx={{ borderRadius: '20px', padding: '5px', margin: '10px', maxWidth: '300px', background: '#555', color: 'white' }}>
     <Box>
       <Typography variant="h6">{value} {deno}</Typography>
     </Box>
     <Box display="flex" justifyContent="space-between" alignItems="center">
-      <IconButton sx={{ color:color }}>{icon}</IconButton>
+      <IconButton sx={{ color: color }}>{icon}</IconButton>
       <Typography variant="body1">{title}</Typography>
     </Box>
   </Box>
@@ -53,22 +53,58 @@ const BusinessDetails = ({ business }) => {
     color: getColor(index, categorias.length),
   }));
 
+  const getSliderSettings = (slidesToShow, slidesToShow6, slidesToShow48) => ({
+    dots: TroubleshootRounded,
+    infinite: true,
+    speed: 500,
+    slidesToShow: slidesToShow,
+    slidesToScroll: 1,
+    centerMode: false,
+    arrows: false, // Desactivar las flechas
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: slidesToShow,
+          slidesToScroll: 1,
+          infinite: false,
+          dots: true
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: slidesToShow6,
+          slidesToScroll: 1,
+          initialSlide: 1
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: slidesToShow48,
+          slidesToScroll: 1
+        }
+      }
+    ]
+  });
+
   return (
-    <Box>
+    <Box sx={{ maxWidth: { xs: '100vw', sm: '500px' } }}>
       <Typography variant="h5">Bienvenido {business ? business.name : ''}</Typography>
       <Typography variant="body1">Todo el tiempo</Typography>
-      <Carousel showThumbs={false} centerMode centerSlidePercentage={isMobile ? 80 : 50} dynamicHeight={false} emulateTouch infiniteLoop showArrows={false} showStatus={false} showIndicators={false}>
+      <Slider {...getSliderSettings(3, 3, 2)}>
         <div>
-          <StatBox title="Ventas" value={ventas} icon={<AccountBalanceWalletIcon />} color={'purple'} deno={'cup'}/>
+          <StatBox title="Ventas" value={ventas} icon={<AccountBalanceWalletIcon />} color={'purple'} deno={'cup'} />
         </div>
         <div>
-          <StatBox title="Visitas" value={visitas} icon={<VisibilityIcon />} color={'green'}/>
+          <StatBox title="Visitas" value={visitas} icon={<VisibilityIcon />} color={'green'} />
         </div>
         <div>
-          <StatBox title="Suscriptores" value={suscriptores} icon={<PersonIcon />} color={'blue'}/>
+          <StatBox title="Suscriptores" value={suscriptores} icon={<PersonIcon />} color={'blue'} />
         </div>
-      </Carousel>
-      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{background:'#555', margin:'20px', borderRadius:'30px', padding:'20px'}}>
+      </Slider>
+      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ background: '#555', margin: '20px', borderRadius: '30px', padding: '20px' }}>
         <Box style={{ height: '300px' }}>
           <PieChart
             data={categoriasConColor}

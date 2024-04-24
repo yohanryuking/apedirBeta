@@ -26,7 +26,7 @@ const NovedadesTab = ({business}) => {
     const handleCreatePost = async (post) => {
         const { error } = await supabase
             .from('posts')
-            .insert({ 'contenido': post, 'negocioNombre':business.name });
+            .insert({ 'contenido': post,'avatarSrc': business.photo_perfil, 'negocioNombre':business.name });
         if (error) {
             console.error('Error creating post:', error.message);
         }

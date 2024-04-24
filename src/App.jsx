@@ -10,6 +10,7 @@ import Home from './components/pages/home/Home';
 import PersonalProfile from './components/pages/home/PersonalProfile';
 import BusinesNotFound from './components/adminPanel/BusinesNotFound';
 import ProductPage from './components/pages/particularPages/ProductPage';
+import EventClient from './components/adminPanel/eventos/EventClient';
 import { AppProvider } from './AppContext';
 import './App.css'
 import "slick-carousel/slick/slick.css"; 
@@ -45,6 +46,7 @@ function App() {
           <Route path="/profile" element={<PersonalProfile />} />
           <Route path="/profile/business" element={<BusinesNotFound />} />
           <Route path="/product/:id" element={<ProductPage />} />
+          <Route path="/event/:id" element={<EventClient />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AppProvider>

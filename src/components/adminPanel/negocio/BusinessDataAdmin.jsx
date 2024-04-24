@@ -323,13 +323,13 @@ const BusinessDataAdmin = ({ business }) => {
     };
 
     return (
-        <Box sx={{ p: 2, width: '500px' }}>
+        <Box sx={{ p: 2, width: { xs: '100vw', sm: '500px' }, }}>
             {/* la parte de la foto de perfil */}
             <>
                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Foto de perfil</Typography>
                 <Box sx={{ display: 'grid', alignItems: 'center', justifyItems: 'center', mb: 2, position: 'relative' }}>
                     <Avatar
-                        src={profilePhoto|| ''}
+                        src={profilePhoto || ''}
                         sx={{ width: 100, height: 100, mr: 2, gridArea: '1 / 1 / 2 / 2' }}
                     />
                     <IconButton

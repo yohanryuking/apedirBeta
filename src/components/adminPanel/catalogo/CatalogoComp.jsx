@@ -55,10 +55,10 @@ const Categories = ({ business }) => {
     }, [categories]); // Agrega categories como una dependencia del useEffect
 
     return (
-        <Box sx={{ m: 2 }}>
+        <Box sx={{ maxWidth: { xs: '100vw', sm: '500px' } }}>
             <Typography variant="h4" sx={{ mb: 2 }}>Categorías</Typography>
             {categories.map((category) => (
-                <Box key={category.id} sx={{ mb: 5, m: 5 }}>
+                <Box key={category.id} sx={{ mb: 5, m: 2 }}>
                     <EditCategory category={category} onDelete={handleDeleteCategory} business={business} />
                 </Box>
             ))}

@@ -12,6 +12,8 @@ import HomeComp from './HomeComp'; // Componente de inicio
 import Cart from './Cart'; // Componente de carrito de compras
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import NovedadesPage from './NovedadesPage';
+import EventosPage from './EventsPage';
 
 // Componentes para mostrar
 const Calendar = () => <Box>Calendar</Box>;
@@ -57,9 +59,9 @@ const Home = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingBottom: '75px' }}>
       <Box sx={{ width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <div style={{ display: value === 0 ? 'block' : 'none' }}><HomeComp /></div>
-        <div style={{ display: value === 1 ? 'block' : 'none' }}><Calendar /></div>
+        <div style={{ display: value === 1 ? 'block' : 'none' }}><EventosPage /></div>
         <div style={{ display: value === 2 ? 'block' : 'none' }}><Cart /></div>
-        <div style={{ display: value === 3 ? 'block' : 'none' }}><Announcements /></div>
+        <div style={{ display: value === 3 ? 'block' : 'none' }}><NovedadesPage /></div>
         {value === 4 && navigate('/profile')}
       </Box>
       <BottomNavigation value={value} onChange={handleChange} sx={{ width: '90%', position: 'fixed', bottom: 15, borderRadius: '30px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)' }}>
@@ -67,7 +69,7 @@ const Home = () => {
         <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<CalendarTodayIcon style={{ fontSize: isMobile ? '2em' : '2.5em', color: value === 1 ? 'purple' : 'black' }} />} />
         <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<ShoppingCartIcon style={{ fontSize: isMobile ? '2em' : '2.5em', color: value === 2 ? 'purple' : 'black' }} />} />
         <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<Campaign style={{ fontSize: isMobile ? '2em' : '2.5em', color: value === 3 ? 'purple' : 'black' }} />} />
-        {/* <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<Avatar src={'https://duerpqsxmxeokygbzexa.supabase.co/storage/v1/object/public/images/' + user + '/avatar.jpg'} style={{ fontSize: isMobile ? '1em' : '1.5em', border: '2px solid purple' }} />} /> */}
+        <BottomNavigationAction sx={{ minWidth: 'auto', padding: isMobile ? '6px 0' : '6px 12px' }} icon={<Avatar src={'https://duerpqsxmxeokygbzexa.supabase.co/storage/v1/object/public/images/' + user + '/avatar.jpg'} style={{ fontSize: isMobile ? '1em' : '1.5em', border: '2px solid purple' }} />} />
       </BottomNavigation>
     </Box>
   );

@@ -3,7 +3,7 @@ import StarIcon from '@mui/icons-material/Star';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../services/client';
 import LoadingAnimation from '../../utils/LoadingAnimation';
@@ -28,6 +28,7 @@ const ProductPage = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [category, setCategory] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -78,6 +79,10 @@ const ProductPage = () => {
         }
     };
 
+    const handleBackClick = () => {
+        navigate(-1);
+    };
+
     if (loading) {
         return <LoadingAnimation />;
     }
@@ -87,7 +92,7 @@ const ProductPage = () => {
             <Box sx={{ margin: isMobile ? '5px' : '20px' }}>
                 <Box sx={{ position: 'relative' }}>
                     <Box sx={{ position: 'absolute', top: 20, left: 20, display: 'flex' }}>
-                        <IconButton sx={{ borderRadius: '50%', background: 'white' }}><ArrowBackIcon /></IconButton>
+                        <IconButton sx={{ borderRadius: '50%', background: 'white' }}><ArrowBackIcon onClick={handleBackClick} /></IconButton>
                     </Box>
                     <Box sx={{ position: 'absolute', top: 20, right: 10, display: 'flex', gap: '5px' }}>
                         <IconButton sx={{ borderRadius: '50%', background: 'white' }}><FavoriteIcon /></IconButton>

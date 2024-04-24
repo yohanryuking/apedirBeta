@@ -22,6 +22,7 @@ const StyledBottomNavigationAction = styled(BottomNavigationAction)({
   borderTopLeftRadius: '20px',
   borderTopRightRadius: '20px',
   padding: '6px 12px',
+  minWidth: '0', // Sobrescribir el min-width
   '&.Mui-selected': {
     color: '#555',
     backgroundColor: '#fff',

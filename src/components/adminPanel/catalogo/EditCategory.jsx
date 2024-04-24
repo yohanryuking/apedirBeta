@@ -6,8 +6,9 @@ import CreateProduct from './CreateProducts';
 import { Box, styled } from '@mui/system';
 import { supabase } from '../../../services/client';
 import LoadingAnimation from '../../utils/LoadingAnimation';
-import { Carousel } from 'react-responsive-carousel';
-import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import { TroubleshootRounded } from '@mui/icons-material';
+
+import Slider from "react-slick";
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -16,6 +17,7 @@ const Root = styled('div')(({ theme }) => ({
     marginBottom: theme.spacing(2),
     backgroundColor: '#f5f5f5',
     borderRadius: theme.shape.borderRadius,
+    maxWidth: '100vw', // Limitar el ancho máximo al 100% del ancho de la ventana del navegador
     margin: theme.spacing(1),
     padding: theme.spacing(2),
     boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.2)', // Sombra definida directamente
@@ -127,6 +129,42 @@ const EditCategory = ({ category, onDelete, business }) => {
         }
     };
 
+    const getSliderSettings = (slidesToShow, slidesToShow6, slidesToShow48) => ({
+        dots: TroubleshootRounded,
+        infinite: true,
+        speed: 500,
+        slidesToShow: slidesToShow,
+        slidesToScroll: 1,
+        centerMode: false,
+        arrows: false, // Desactivar las flechas
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: slidesToShow,
+                    slidesToScroll: 1,
+                    infinite: false,
+                    dots: true
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: slidesToShow6,
+                    slidesToScroll: 1,
+                    initialSlide: 1
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: slidesToShow48,
+                    slidesToScroll: 1
+                }
+            }
+        ]
+    });
+
     useEffect(() => {
         const fetchProducts = async () => {
             const { data: products, error } = await supabase
@@ -164,14 +202,14 @@ const EditCategory = ({ category, onDelete, business }) => {
                     <AddButton variant="contained" onClick={handleOpenModal}>
                         Agregar productos
                     </AddButton>
-                    <Box sx={{ overflow: 'hidden', maxWidth: '100%' }}>
-                        <Carousel showThumbs={false} showIndicators={false} centerMode centerSlidePercentage={33} showArrows>
+                    <Box sx={{ }}>
+                        <Slider {...getSliderSettings(2, 2, 1.1)}>
                             {products.map((product) => (
-                                <Box m={2} key={product.id}>
+                                <Box p={1} key={product.id}>
                                     <EditProducts product={product} />
                                 </Box>
                             ))}
-                        </Carousel>
+                        </Slider>
                     </Box>
                     <Modal open={openModal} onClose={handleCloseModal}>
                         <div> <CreateProduct closeModal={handleCloseModal} createProduct={handleAddProduct} /></div>

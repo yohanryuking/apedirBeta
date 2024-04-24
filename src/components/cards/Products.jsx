@@ -20,7 +20,7 @@ const ProductCard = ({ product, addToCart }) => {
 
     return (
         <Card style={{ position: 'relative', borderRadius: '20px', width: '250px' }} >
-            <CardMedia component="img" image={image_url} alt={name} height="150" onClick={() => { navigate('/product') }} />
+            <CardMedia component="img" image={image_url} alt={name} height="150" />
             <IconButton onClick={handleAddToCart} style={{ position: 'absolute', top: 10, right: 10, backgroundColor: 'rgba(260, 260, 260, 0.5)', borderRadius: '10px', }}>
                 <FontAwesomeIcon icon={faShoppingCart} style={{ color: 'black' }} />
             </IconButton>

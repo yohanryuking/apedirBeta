@@ -1,40 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Card, CardContent, CardMedia, Typography, Box, Button, TextField } from '@mui/material';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardMedia, Typography, Box, Button, TextField, IconButton } from '@mui/material';
+import { AppContext } from '../../../AppContext';
 import { supabase } from '../../../services/client';
 import LoadingAnimation from '../../utils/LoadingAnimation';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ShareIcon from '@mui/icons-material/Share';
 
 const EventClient = () => {
     const [ticketCount, setTicketCount] = useState(0);
     const [eventData, setEventData] = useState(null);
-    const { eventName } = useParams();
+    const { id: eventId } = useParams();
+    const { userId, events } = useContext(AppContext);
+    const navigate = useNavigate();
 
-    const [userId, setUserId] = useState(null);
     useEffect(() => {
-        const fetchUserId = async () => {
-            const user = await supabase.auth.getUser();
-            setUserId(user.data.user.id);
+        if (!events) {
+            return <LoadingAnimation />;
         }
-        fetchUserId();
-    }, []);
 
-    useEffect(() => {
-        const fetchEvent = async () => {
-            const { data, error } = await supabase
-                .from('events')
-                .select('*')
-                .eq('name', eventName);
+        const event = events.find(event => String(event.id) === String(eventId));
+        setEventData(event);
+    }, [eventId, events]);
 
-            if (error) {
-                console.error('Error fetching event:', error);
-            } else {
-                setEventData(data[0]);
-                console.log(data[0]);
-            }
-        };
-
-        fetchEvent();
-    }, [eventName]);
 
     const handleIncrement = () => {
         setTicketCount(prevCount => prevCount + 1);
@@ -46,8 +35,26 @@ const EventClient = () => {
         }
     };
 
+    const handleBackClick = () => {
+        navigate(-1);
+    };
+
     const handleReservation = () => {
         // Lógica para realizar la reserva del evento
+    };
+
+    const handleShare = () => {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Compartir Evento',
+                text: 'Mira este evento increíble!',
+                url: window.location.href,
+            })
+                .then(() => console.log('Contenido compartido!'))
+                .catch((error) => console.log('Hubo un error al compartir', error));
+        } else {
+            console.log('La API Web Share no está disponible en tu navegador');
+        }
     };
 
     if (!eventData) {
@@ -56,7 +63,16 @@ const EventClient = () => {
 
     return (
         <Card sx={{ display: 'flex', flexDirection: 'column' }}>
-            <CardMedia component="img" sx={{ flex: '0 1 auto', height: '100px' }} image={`https://duerpqsxmxeokygbzexa.supabase.co/storage/v1/object/public/images/${userId}/events/${eventName}`} alt="Imagen del evento" />
+            <Box sx={{ position: 'relative' }}>
+                <Box sx={{ position: 'absolute', top: 20, left: 20, display: 'flex' }}>
+                    <IconButton sx={{ borderRadius: '50%', background: 'white' }}><ArrowBackIcon onClick={handleBackClick} /></IconButton>
+                </Box>
+                <Box sx={{ position: 'absolute', top: 20, right: 10, display: 'flex', gap: '5px' }}>
+                    <IconButton sx={{ borderRadius: '50%', background: 'white' }}><FavoriteIcon /></IconButton>
+                    <IconButton sx={{ borderRadius: '50%', background: 'white' }}><ShareIcon onClick={handleShare} /></IconButton>
+                </Box>
+            </Box>
+            <CardMedia component="img" sx={{ flex: '0 1 auto', height: '100px' }} image={eventData.image_url} alt="Imagen del evento" />
             <CardContent sx={{ flexGrow: 1 }}>
                 <Typography variant="h5" component="div">{eventData.name}</Typography>
                 <Typography variant="body2" color="text.secondary">Entradas disponibles: {eventData.availableTickets}</Typography>
@@ -64,7 +80,7 @@ const EventClient = () => {
                     <Box>
                         <Typography variant="body2">Mesa</Typography>
                         <Typography variant="h6">{eventData.table}</Typography>
-                       </Box>
+                    </Box>
                     <Box>
                         <Typography variant="body2">Entradas</Typography>
                         <Typography variant="h6">{ticketCount}</Typography>
