@@ -13,8 +13,12 @@ import ProductPage from './components/pages/particularPages/ProductPage';
 import EventClient from './components/adminPanel/eventos/EventClient';
 import { AppProvider } from './AppContext';
 import './App.css'
-import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { SnackbarProvider } from 'notistack';
+import Prueba from './components/adminPanel/eventos/Prueba';
+import PerfilNegocio from './components/pages/particularPages/PerfilNegocio';
+
 
 function App() {
 
@@ -36,20 +40,25 @@ function App() {
 
   return (
     <>
-      <AppProvider>
-        <CssBaseline />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/verification" element={<Verification />} />
-          <Route path="/profile" element={<PersonalProfile />} />
-          <Route path="/profile/business" element={<BusinesNotFound />} />
-          <Route path="/product/:id" element={<ProductPage />} />
-          <Route path="/event/:id" element={<EventClient />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </AppProvider>
+      <SnackbarProvider maxSnack={3}>
+        <AppProvider>
+          <CssBaseline />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verification" element={<Verification />} />
+            <Route path="/profile" element={<PersonalProfile />} />
+            <Route path="/profile/business" element={<BusinesNotFound />} />
+            <Route path="/product/:id" element={<ProductPage />} />
+            <Route path="/event/:id" element={<EventClient />} />
+            <Route path="/pruebas/:id" element={<Prueba />} />
+            <Route path="/business/:name" element={<PerfilNegocio />} />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AppProvider>
+      </SnackbarProvider>
     </>
   )
 }

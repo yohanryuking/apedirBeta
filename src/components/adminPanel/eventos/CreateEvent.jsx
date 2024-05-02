@@ -5,12 +5,13 @@ import moment from 'moment';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import EventsImagesUpload from '../../utils/ImagesUpload';
-import { ToastContainer, toast } from 'react-toastify';
 import { supabase } from '../../../services/client';
-import 'react-toastify/dist/ReactToastify.css';
+import { useSnackbar } from 'notistack';
 
 
 const CreateEvent = ({ business }) => {
+
+    const { enqueueSnackbar } = useSnackbar();
 
 
     const convertMilitaryToNormalTime = (time) => {
@@ -59,10 +60,11 @@ const CreateEvent = ({ business }) => {
 
         if (error) {
             console.error('Error creating event:', error.message);
-            toast.error('Error creating event: ' + error.message);
+            enqueueSnackbar('Error creating event: ' + error.message, {variant:'error'});
         } else {
             console.log('Event created successfully:', events);
-            // toast.success('Event created successfully');
+            enqueueSnackbar('Event created successfully', {variant:'success'});
+            enqueueSnackbar('Cargando Imagen', {variant:'info'});
 
 
             // Si la creación del evento fue exitosa, sube la imagen al bucket
@@ -76,11 +78,11 @@ const CreateEvent = ({ business }) => {
 
                 if (uploadError) {
                     console.error('Error uploading image:', uploadError.message);
-                    // toast.error('Error uploading image: ' + uploadError.message);
+                    enqueueSnackbar('Error uploading image: ' + uploadError.message, {variant:'error'});
                 } else {
                     console.log(uploadData)
                     console.log('Image uploaded successfully:', uploadData);
-                    // toast.success('Image uploaded successfully');
+                    enqueueSnackbar('Image uploaded successfully', {variant:'success'});
 
                     // Obtén la URL de la imagen
                     const { data: urlData, error: urlError } = await supabase
@@ -90,7 +92,6 @@ const CreateEvent = ({ business }) => {
 
                     if (urlError) {
                         console.error('Error getting image URL:', urlError.message);
-                        // toast.error('Error getting image URL: ' + urlError.message);
                     } else {
                         // Actualiza el evento con la URL de la imagen
 
@@ -101,10 +102,9 @@ const CreateEvent = ({ business }) => {
                             .select()
                         if (updateError) {
                             console.error('Error updating event:', updateError.message);
-                            // toast.error('Error updating event: ' + updateError.message);
                         } else {
                             console.log('Event updated successfully with image URL');
-                            // toast.success('Event updated successfully with image URL');
+                            enqueueSnackbar('Creacion de evento completada', {variant:'success'});
                         }
                     }
                 }
@@ -115,7 +115,6 @@ const CreateEvent = ({ business }) => {
     return (
 
         <Box sx={{ borderRadius: 3, m: 2, }}>
-            <ToastContainer />
             <Box sx={{ width: '100%', height: '200px', bgcolor: 'grey.500', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 3, mb: 2 }}>
                 {eventImage ? <img src={URL.createObjectURL(eventImage)} alt="Evento" style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: 3 }} /> : <IconButton onClick={() => setIsImageModalOpen(true)}><Edit /></IconButton>}
             </Box>

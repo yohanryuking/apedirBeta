@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Avatar, Box } from '@mui/material';
 import { supabase } from '../../services/client'; // Assuming you have supabase configured
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const ImagesController = () => {
     const [selectedImage, setSelectedImage] = useState(null);
@@ -25,7 +23,7 @@ const ImagesController = () => {
                     setIsLoading(false);
                 }
             } catch (error) {
-                toast.error('Problemas para conectar con el servidor, revise su conexion a internet');
+                // toast.error('Problemas para conectar con el servidor, revise su conexion a internet');
             }
         }
 
@@ -36,7 +34,7 @@ const ImagesController = () => {
     const handleSelectImage = async (event) => {
         const file = event.target.files[0];
         console.log(file);
-        toast.success('Subiendo imagen, espere')
+        // toast.success('Subiendo imagen, espere')
         if (file) {
             const userId = (await supabase.auth.getUser()).data.user.id; // Reemplaza esto con el ID del usuario
             const newName = 'avatar'; // Reemplaza esto con el nuevo nombre que quieras
@@ -48,7 +46,7 @@ const ImagesController = () => {
 
             if (error) {
                 console.error('Error uploading image:', error);
-                toast.error('Error al subir la imagen');
+                // toast.error('Error al subir la imagen');
             } else {
                 console.log('Image uploaded successfully:', data.fullPath);
                 setSelectedImage(data.fullPath);
@@ -61,9 +59,9 @@ const ImagesController = () => {
                     .eq('id', userId);
                 if (updateError) {
                     console.error('Error updating user:', updateError);
-                    toast.error('Error al actualizar el usuario');
+                    // toast.error('Error al actualizar el usuario');
                 } else {
-                    toast.success('Imagen subida correctamente, actualice la pagina para ver los cambios');
+                    // toast.success('Imagen subida correctamente, actualice la pagina para ver los cambios');
                 }
             }
         }
@@ -77,11 +75,11 @@ const ImagesController = () => {
                 .remove(userId+'/avatar.jpg');
             if (error) {
                 console.error('Error removing image:', error);
-                toast.error('Error al eliminar la imagen');
+                // toast.error('Error al eliminar la imagen');
             } else {
                 console.log('Image removed successfully:', data);
                 setSelectedImage(null);
-                toast.success('Imagen eliminada correctamente');
+                // toast.success('Imagen eliminada correctamente');
             }
 
     };
@@ -98,7 +96,7 @@ const ImagesController = () => {
                 maxWidth: '600px',
             }}
         >
-            <ToastContainer />
+            {/* <ToastContainer /> */}
             {isLoading ? (
                 <p>Cargando...</p>
             ) : (

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Button } from '@mui/material';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useSnackbar } from 'notistack';
 
 
 const EventsImagesUpload = ({ handleImageUpload }) => {
+
+    const { enqueueSnackbar } = useSnackbar();
 
     const [previewImage, setPreviewImage] = useState(null);
 
@@ -13,13 +14,11 @@ const EventsImagesUpload = ({ handleImageUpload }) => {
         console.log(event.target.files[0]);
         handleImageUpload(file);
         setPreviewImage(URL.createObjectURL(file));
-        toast.success("Imagen cargada correctamente.");
+        enqueueSnackbar('Imagen cargada correctamente.', { variant: 'success' })
     };
 
     return (
         <Box m={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, backgroundColor: 'white', width: '300px', height: '400px' }}>
-            <ToastContainer />
-
             <Button variant="contained" component="label" sx={{ marginTop: '20px' }}>
                 Foto de Portada
                 <input type="file" hidden onChange={handleChange} />

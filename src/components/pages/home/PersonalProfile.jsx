@@ -6,11 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import LoadingAnimation from '../../utils/LoadingAnimation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 // import ImagesController from './ImagesController';
 const ImagesController = React.lazy(() => import('../../utils/ImagesController'));
 import CloseIcon from '@mui/icons-material/Close';
+import { useSnackbar } from 'notistack';
 
 const BlurredBackground = styled(Box)(({ theme }) => ({
   backgroundImage: `url('profilePicture.jpg')`,
@@ -37,6 +36,8 @@ const PersonalProfile = () => {
   const [phone, setPhone] = useState('');
   const [id, setId] = useState('');
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const handleOpen = () => {
     setOpen(true);
   };
@@ -56,7 +57,7 @@ const PersonalProfile = () => {
           .select('name,phone,plan,email,photoUrl').eq('id', userId);
         if (error) {
           console.error('Error fetching user profile:', error.message);
-          toast.error('Error fetching user profile: ' + error.message);
+          enqueueSnackbar('Error fetching user profile: ' + error.message, { variant: 'error' });
         } else {
           setUser(data[0]);
           setName(data[0]?.name);
@@ -65,7 +66,7 @@ const PersonalProfile = () => {
           setAvatarUrl(data[0]?.photoUrl)
         }
       } catch (error) {
-        toast.error('Problemas para conectar con el servidor, revise su conexion a internet');
+        enqueueSnackbar('Problemas para conectar con el servidor, revise su conexion a internet', { variant: 'error' });
       }
     }
     fetchUser();
@@ -82,10 +83,10 @@ const PersonalProfile = () => {
       .eq('id', id);
     if (error) {
       console.error('Error updating user profile:', error.message);
-      toast.error('Error fetching user profile: ' + error.message);
+      enqueueSnackbar('Error fetching user profile: ' + error.message, {variant:'error'});
     } else {
       console.log('User profile updated successfully:', data);
-      toast.success('User profile updated successfully'); z
+      enqueueSnackbar('User profile updated successfully', {variant:'success'});
     }
   };
 
@@ -116,9 +117,8 @@ const PersonalProfile = () => {
       <IconButton onClick={() => navigate(-1)}>
         <ArrowBackIcon />
       </IconButton>
-      <ToastContainer />
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <ProfilePicture src={avatarUrl ? 'https://duerpqsxmxeokygbzexa.supabase.co/storage/v1/object/public/' + avatarUrl : 'defaultAvatar.jpg'} />
+        <ProfilePicture src={avatarUrl ? 'https://duerpqsxmxeokygbzexa.supabase.co/storage/v1/object/public/' + avatarUrl : 'defaultAvatar.jpg'} />
         <Box >
           <IconButton
             onClick={handleOpen}
@@ -161,13 +161,13 @@ const PersonalProfile = () => {
         </Grid>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
-            <TextField label="Nombre" value={name === null ? "" :name} onChange={(e) => setName(e.target.value)} fullWidth margin="normal" />
+            <TextField label="Nombre" value={name === null ? "" : name} onChange={(e) => setName(e.target.value)} fullWidth margin="normal" />
           </Grid>
           <Grid item xs={12} md={6}>
-            <TextField label="Correo electrónico" value={email === null ? "" :email} fullWidth margin="normal" />
+            <TextField label="Correo electrónico" value={email === null ? "" : email} fullWidth margin="normal" />
           </Grid>
           <Grid item xs={12} md={6}>
-            <TextField label="Teléfono" value={phone === null ? "" :phone} onChange={(e) => setPhone(e.target.value)} fullWidth margin="normal" />
+            <TextField label="Teléfono" value={phone === null ? "" : phone} onChange={(e) => setPhone(e.target.value)} fullWidth margin="normal" />
           </Grid>
           <Grid item xs={12} md={6}>
             <ListItemText primary="Plan Actual" secondary={planLevel(user?.plan)} />

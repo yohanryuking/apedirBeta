@@ -16,24 +16,24 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import EventIcon from '@mui/icons-material/Event';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import QRCode from 'qrcode';
 
 
 
 
 const EventClient = () => {
-    const [ticketCount, setTicketCount] = useState(0); // Asume que ticketCount se establece en algún lugar
-    const textField1Ref = useRef();
-    const textField2Ref = useRef();
-    const textField3Ref = useRef();
-    const textField4Ref = useRef();
-    const textField5Ref = useRef();
+    const [ticketCount, setTicketCount] = useState(0);
+    const [textField1, setTextField1] = useState('');
+    const [textField2, setTextField2] = useState('');
+    const [textField3, setTextField3] = useState('');
+    const [textField4, setTextField4] = useState('');
+    const [textField5, setTextField5] = useState('');
 
-    const qrRef = useRef();
-    let downloadLink = document.createElement("a");
+    const [postContent, setPostContent] = useState('');
 
-    const [numberB, setNumberB] = useState(null);
-    const [reser, setReser] = useState('');
+    const handlePostContentChange = (event) => {
+        setPostContent(event.target.value);
+    };
+
     const [eventData, setEventData] = useState(null);
     const { id: eventId } = useParams();
     const { userId, events, businesses } = useContext(AppContext);
@@ -70,28 +70,14 @@ const EventClient = () => {
             if (!eventData) {
                 return;
             }
+
             const business = businesses.find(b => b.name === eventData.owner);
             const photo = business ? business.photo_perfil : null;
-            const businessOwnerPhoneNumber = business ? business.phone : '';
             setPefilUrl(photo);
-            setNumberB(businessOwnerPhoneNumber)
         };
 
         getBusinessProfilePhoto();
     }, [eventData]);
-
-    useEffect(() => {
-        const generateQR = async () => {
-            try {
-                const url = await QRCode.toDataURL(`Reserva ID: ${reser[0].id}`);
-                setQrUrl(url);
-            } catch (err) {
-                console.error(err);
-            }
-        };
-
-        generateQR();
-    }, [reser]);
 
 
     const handleIncrement = () => {
@@ -119,49 +105,31 @@ const EventClient = () => {
     // };
 
     const handleReservation = async () => {
-        const ticketValues = [
-            textField1Ref.current ? textField1Ref.current.value : '',
-            textField2Ref.current ? textField2Ref.current.value : '',
-            textField3Ref.current ? textField3Ref.current.value : '',
-            textField4Ref.current ? textField4Ref.current.value : '',
-            textField5Ref.current ? textField5Ref.current.value : '',
-        ].slice(0, ticketCount);
-        const tickets = ticketValues.map(ci => ({ ci }));
-
-        console.log(tickets);
         try {
-            // Aquí puedes hacer lo que necesites con los valores de los campos de texto
+            const ticketValues = [textField1, textField2, textField3, textField4, textField5].slice(0, ticketCount);
+            console.log(ticketValues); // Aquí puedes hacer lo que necesites con los valores de los campos de texto
             // Crear la nueva reserva
             const { data: reservation, error } = await supabase
-                .from('eventsReservations')
+                .from('reservations')
                 .insert([
                     {
                         user_id: userId,
                         event_id: eventId,
                         tickets: tickets // tickets es un array de objetos { ci: 'CI de la persona' }
                     }
-                ]).select();
+                ]);
 
             if (error) throw error;
 
-            console.log(reservation)
-            setReser(reservation)
-
             // Crear la nueva venta
-            const { data: sale, error: saleError } = await supabase
-                .from('eventsSales')
-                .insert([
-                    {
-                        events_id: eventId,
-                        reservation_id: reservation[0].id,
-                        amount: eventData.price * ticketCount, // Asegúrate de que 'amount' esté definido
-                        ownerB: eventData.owner // Asegúrate de que 'businessId' esté definido
-                    }
-                ]);
+            // const { data: sale, error: saleError } = await supabase
+            //     .from('sales')
+            //     .insert([
+            //         { event_id: eventId, reservation_id: reservation.id }
+            //     ]);
 
-            if (saleError) throw saleError;
+            // if (saleError) throw saleError;
             enqueueSnackbar('Reserva realizada con éxito', { variant: 'success' }); // Añade esta línea
-            setView('tertiary')
 
         } catch (error) {
             console.error('Error en la reserva: ', error);
@@ -175,6 +143,12 @@ const EventClient = () => {
 
     const handleClose = () => {
         setAnchorEl(null);
+    };
+
+    const getEventDateInWords = (eventDate) => {
+        const date = parseISO(eventDate);
+        const now = new Date();
+        return formatDistanceToNow(date, { addSuffix: true, locale: es });
     };
 
     const handleShare = () => {
@@ -194,25 +168,12 @@ const EventClient = () => {
 
     const shareButtonRef = useRef(); // Añade esta línea
 
-    const [qrUrl, setQrUrl] = useState('');
-
-    const downloadQR = () => {
-        let downloadLink = document.createElement("a");
-        downloadLink.href = qrUrl;
-        downloadLink.download = `${eventData.name}-${reser[0].id}-qr-code.png`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-    };
-
     if (!eventData) {
         return <LoadingAnimation />;
     }
 
     const CardContentInitial = () => (
-
         <CardContent sx={{ flexGrow: 1 }}>
-            <Avatar src={perfilUrl} sx={{ width: 65, height: 65, transform: 'translateY(-80%)', margin:'0 auto' }} />
             <Typography variant="h3">{eventData.name}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
                 <LocationOnIcon />
@@ -276,11 +237,29 @@ const EventClient = () => {
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>Total</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: '2px' }}> <Typography variant="h6" >{eventData.price * ticketCount} </Typography>
                     <Typography variant="body5" sx={{ color: "text.secondary" }}>CUP</Typography></Box>
-                {ticketCount > 0 && <TextField inputRef={textField1Ref} label={`Número de carnet 1`} variant="outlined" fullWidth />}
-                {ticketCount > 1 && <TextField inputRef={textField2Ref} label={`Número de carnet 2`} variant="outlined" fullWidth />}
-                {ticketCount > 2 && <TextField inputRef={textField3Ref} label={`Número de carnet 3`} variant="outlined" fullWidth />}
-                {ticketCount > 3 && <TextField inputRef={textField4Ref} label={`Número de carnet 4`} variant="outlined" fullWidth />}
-                {ticketCount > 4 && <TextField inputRef={textField5Ref} label={`Número de carnet 5`} variant="outlined" fullWidth />}
+                {/* {ticketCount > 0 && <TextField value={textField1} onChange={handleTF1change} label={`Número de carnet 1`} variant="outlined" fullWidth />}
+                {ticketCount > 1 && <TextField value={textField2} onChange={(e) => { setTextField2(e.target.value) }} label={`Número de carnet 2`} />}
+                {ticketCount > 2 && <TextField value={textField3} onChange={e => setTextField3(e.target.value)} label={`Número de carnet 3`} />}
+                {ticketCount > 3 && <TextField value={textField4} onChange={e => setTextField4(e.target.value)} label={`Número de carnet 4`} />}
+                {ticketCount > 4 && <TextField value={textField5} onChange={e => setTextField5(e.target.value)} label={`Número de carnet 5`} />}
+               */}
+                <TextField
+                    value={textField1}
+                    // onChange={handleTF1change()}
+                    placeholder={`Número de carnet 1`}
+                    variant="outlined"
+                    fullWidth
+                />
+
+                <TextField
+                    multiline
+                    rows={2}
+                    variant="outlined"
+                    fullWidth
+                    placeholder="Que necesitas comunicar a tus clientes?"
+                    value={postContent}
+                    onChange={handlePostContentChange}
+                />
                 <Button
                     variant="contained"
                     sx={{
@@ -297,34 +276,15 @@ const EventClient = () => {
         </CardContent>
     );
 
-
     const CardContentTertiary = () => (
         <CardContent sx={{ flexGrow: 1 }}>
-            <Typography variant="h5" component="div">
-                Reserva creada
-            </Typography>
-            <Typography variant="body2">
-                Tu reserva ha sido creada pero aún no ha sido pagada. Puedes verla en tus reservas.
-            </Typography>
-            {/* <QRCode value={`Reserva ID: ${reser[0].id}`} ref={qrRef} />
-             */}
-
-            {qrUrl && <img src={qrUrl} alt="QR Code" />}
-            <Button variant="contained" color="primary" onClick={downloadQR}>
-                Guardar QR
-            </Button>
-            <Typography variant="body2">
-                Contacta al dueño del evento para realizar el pago.
-            </Typography>
-            <Button variant="contained" color="primary" href={`https://wa.me/+53${numberB}?text=Hola, quiero pagar la reserva para el evento ${eventData.name}.`} target="_blank" rel="noopener noreferrer">
-                Contactar
-            </Button>
+            {/* Contenido para la vista terciaria */}
         </CardContent>
     );
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-            <Card sx={{ display: 'flex', flexDirection: 'column', width: { xs: '100vw', sm: '500px' }, minHeight: '100%', borderTopRightRadius: '15px', overflow: 'auto' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+            <Card sx={{ display: 'flex', flexDirection: 'column', width: { xs: '100vw', sm: '500px' }, height: '100%', borderTopRightRadius: '15px' }}>
                 <Box sx={{ position: 'relative' }}>
                     <Box sx={{ position: 'absolute', top: 20, left: 20, display: 'flex' }}>
                         <IconButton sx={{ borderRadius: '50%', background: 'white' }}><ArrowBackIcon onClick={handleBackClick} /></IconButton>
@@ -359,7 +319,10 @@ const EventClient = () => {
                         </Menu>
                     </Box>
                 </Box>
-                <CardMedia component="img" sx={{ flex: '0 1 auto', transition: 'height 0.2s ease', minHeight: '30%' }} height={view === 'initial' ? "70%" : view === 'secondary' ? "30%" : "50%"} image={eventData.image_url} alt="Imagen del evento" />
+                <CardMedia component="img" sx={{ flex: '0 1 auto', transition: 'height 0.2s ease' }} height={view === 'initial' ? "70%" : view === 'secondary' ? "30%" : "50%"} image={eventData.image_url} alt="Imagen del evento" />
+                {view === 'initial' && (
+                    <Avatar src={perfilUrl} sx={{ width: 65, height: 65, position: 'absolute', top: '70%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+                )}
                 {view === 'initial' && <CardContentInitial sx={{ transition: 'all 2s ease-in-out' }} />}
                 {view === 'secondary' && <CardContentSecondary sx={{ transition: 'all 2s ease-in-out' }} />}
                 {view === 'tertiary' && <CardContentTertiary sx={{ transition: 'all 2s ease-in-out' }} />}

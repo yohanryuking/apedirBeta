@@ -481,6 +481,7 @@ const BusinessDataAdmin = ({ business }) => {
                     <Box display="flex" alignItems="center">
                         <FaPhoneAlt size={24} style={{ marginRight: '10px' }} />
                         <Typography variant="body1" mr={2}>Teléfono:</Typography>
+                        <Typography variant="body1" >+53</Typography>
                         <TextField
                             value={phone}
                             disabled={!isEditable}

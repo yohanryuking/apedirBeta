@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { supabase } from '../../services/client';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useSnackbar } from 'notistack';
 
 
 const ImageUpload = () => {
@@ -10,26 +9,27 @@ const ImageUpload = () => {
   const [coverDialogOpen, setCoverDialogOpen] = useState(false);
   const [profileImagen, setProfileImagen] = useState();
   const [coverImagen, setCoverImagen] = useState();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    toast.success('A continuacion seleccione una o ambas fotos a subir, tenga en cuenta que segun el tamano de la imagen y su conexion a internet, el proceso puede tardar unos segundos');
+    enqueueSnackbar('A continuacion seleccione una o ambas fotos a subir, tenga en cuenta que segun el tamano de la imagen y su conexion a internet, el proceso puede tardar unos segundos', { variant: 'info' });
   }, []
   );
 
   const handleProfileButtonClick = (event) => {
     setProfileDialogOpen(true);
     setProfileImagen(event.target.files[0])
-    toast.success('Imagen de perfil configurada correctamente, subala o agregue la de portada si no lo ha hecho');
+    enqueueSnackbar('Imagen de perfil configurada correctamente, subala o agregue la de portada si no lo ha hecho', { variant: 'success' });
   };
 
   const handleCoverButtonClick = (event) => {
     setCoverDialogOpen(true);
     setCoverImagen(event.target.files[0])
-    toast.success('Imagen de portada configurada correctamente, subala o agregue la de portada si no lo ha hecho');
+    enqueueSnackbar('Imagen de portada configurada correctamente, subala o agregue la de portada si no lo ha hecho', { variant: 'success' });
   };
 
   const handleSelectImage = async () => {
-    toast.success('Subiendo imagen, espere')
+    enqueueSnackbar('Subiendo imagen, espere', { variant: 'info' })
     const user = (await supabase.auth.getUser()).data.user.email;
     console.log(user)
 
@@ -43,7 +43,7 @@ const ImageUpload = () => {
 
       if (error) {
         console.error('Error uploading image:', error);
-        toast.error('Error al subir la imagen');
+        enqueueSnackbar('Error al subir la imagen', { variant: 'error' });
       } else {
         console.log('Image uploaded successfully:', coverImagen);
         console.log(coverImagen)
@@ -56,9 +56,9 @@ const ImageUpload = () => {
           .eq('owner', user);
         if (updateError) {
           console.error('Error updating userdata.fullPath:', updateError);
-          toast.error('Error al actualizar su foto de portada del negocio');
+          enqueueSnackbar('Error al actualizar su foto de portada del negocio', { variant: 'error' });
         } else {
-          toast.success('Imagen subida correctamente, actualice la pagina para ver los cambios');
+          enqueueSnackbar('Imagen subida correctamente, actualice la pagina para ver los cambios', { variant: 'success' });
         }
       }
     }
@@ -73,7 +73,7 @@ const ImageUpload = () => {
 
       if (error) {
         console.error('Error uploading image:', error);
-        toast.error('Error al subir la imagen');
+        enqueueSnackbar('Error al subir la imagen', { variant: 'error' });
       } else {
         console.log('Image uploaded successfully:', profileImagen);
         console.log(profileImagen)
@@ -86,9 +86,9 @@ const ImageUpload = () => {
           .eq('owner', user);
         if (updateError) {
           console.error('Error updating user:', updateError);
-          toast.error('Error al actualizar su foto de perfil del negocio');
+          enqueueSnackbar('Error al actualizar su foto de perfil del negocio', { variant: 'error' });
         } else {
-          toast.success('Imagen subida correctamente, actualice la pagina para ver los cambios');
+          enqueueSnackbar('Imagen subida correctamente, actualice la pagina para ver los cambios', {variant:'success'});
         }
       }
     }
@@ -96,7 +96,6 @@ const ImageUpload = () => {
 
   return (
     <Box m={4} sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-      <ToastContainer />
       <Button variant="contained" component="label" sx={{ marginTop: '20px' }}>
         Foto de Perfil
         <input type="file" hidden onChange={handleProfileButtonClick} />
