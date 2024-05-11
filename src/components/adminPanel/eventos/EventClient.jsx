@@ -297,7 +297,6 @@ const EventClient = () => {
         </CardContent>
     );
 
-
     const CardContentTertiary = () => (
         <CardContent sx={{ flexGrow: 1 }}>
             <Typography variant="h5" component="div">
