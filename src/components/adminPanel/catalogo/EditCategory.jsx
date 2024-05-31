@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Grid, Typography, IconButton, Button, Modal } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import EditProducts from './EditProduct';
@@ -11,6 +11,7 @@ import { TroubleshootRounded } from '@mui/icons-material';
 import Slider from "react-slick";
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { AppContext } from '../../../AppContext';
 
 
 const Root = styled('div')(({ theme }) => ({
@@ -44,12 +45,14 @@ const AddButton = styled(Button)(({ theme }) => ({
 }));
 
 const EditCategory = ({ category, onDelete, business }) => {
-    const [products, setProducts] = useState([]);
+    const [productsint, setProductsint] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(false); // Nuevo estado para rastrear la carga
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [currentProduct, setCurrentProduct] = useState(null);
 
+    const { products, setProducts } = useContext(AppContext);
 
     const handleOpenModal = () => {
         setOpenModal(true);
@@ -131,7 +134,7 @@ const EditCategory = ({ category, onDelete, business }) => {
 
     const getSliderSettings = (slidesToShow, slidesToShow6, slidesToShow48) => ({
         dots: TroubleshootRounded,
-        infinite: true,
+        infinite: products.length > 1, // Desactivar el comportamiento infinito si solo hay un producto
         speed: 500,
         slidesToShow: slidesToShow,
         slidesToScroll: 1,
@@ -166,21 +169,9 @@ const EditCategory = ({ category, onDelete, business }) => {
     });
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            const { data: products, error } = await supabase
-                .from('products')
-                .select('*')
-                .eq('category', category.id); // Busca los productos que pertenecen a la categoría actual
 
-            if (error) {
-                console.log('Error fetching products:', error);
-            } else {
-                setProducts(products); // Guarda los productos en el estado
-            }
-        };
-
-        fetchProducts();
-    }, [category.id]); // Dependencia de useEffect
+       setProductsint(products.filter(product => product.category === category.id))
+    }, [category.id, products]); // Dependencia de useEffect
 
     return (
         <Root>
@@ -203,16 +194,20 @@ const EditCategory = ({ category, onDelete, business }) => {
                         Agregar productos
                     </AddButton>
                     <Box sx={{ }}>
-                        <Slider {...getSliderSettings(2, 2, 1.1)}>
-                            {products.map((product) => (
-                                <Box p={1} key={product.id}>
-                                    <EditProducts product={product} />
-                                </Box>
+                        <Slider {...getSliderSettings(2, 2, 1)}>
+                            {productsint.map((product) => (
+                                product && (
+                                    <Box p={1} key={product.id}>
+                                        <EditProducts product={product} openModal={handleOpenModal} setCurrentProduct={setCurrentProduct}/>
+                                    </Box>
+                                )
                             ))}
                         </Slider>
                     </Box>
                     <Modal open={openModal} onClose={handleCloseModal}>
-                        <div> <CreateProduct closeModal={handleCloseModal} createProduct={handleAddProduct} /></div>
+                        <div> <CreateProduct closeModal={handleCloseModal} createProduct={handleAddProduct} product={currentProduct}/>{}</div>
+                        {/* {console.log(product)} */}
+                        
                     </Modal>
                 </>
             )}

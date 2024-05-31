@@ -228,8 +228,14 @@ export const AppProvider = ({ children }) => {
     }
   }, [isUserDataLoaded]);
 
+  const updatePostInContext = (updatedPost) => {
+    setPosts(posts.map(post =>
+      post.id === updatedPost.id ? updatedPost : post
+    ));
+  };
+
   return (
-    <AppContext.Provider value={{ products, businesses, cart, users, categoryBusiness, cayegoryProducts, events, eventsRegister, orders, posts, sellsTotal, socialLinks, suscripciones, ventas, views, userId, userEmail, isUserDataLoaded, isAllDataLoaded }}>
+    <AppContext.Provider value={{ products, setProducts, businesses, cart, users, categoryBusiness, cayegoryProducts, events, eventsRegister, orders, posts, updatePostInContext, sellsTotal, socialLinks, suscripciones, ventas, views, userId, userEmail, isUserDataLoaded, isAllDataLoaded }}>
       {children}
     </AppContext.Provider>
   );
