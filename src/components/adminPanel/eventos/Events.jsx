@@ -1,22 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Card, Typography, CardContent, CardMedia, IconButton } from '@mui/material';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { useSnackbar } from 'notistack';
+import { supabase } from '../../../services/client';
+import { AppContext } from '../../../AppContext';
 
 
 const EventCard = ({ event, cliente }) => {
+    const { events, setEvents } = useContext(AppContext);
 
     const [isClient, setIsClient] = useState(false);
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         if (cliente) {
             setIsClient(cliente);
         }
-    }, []);
+    }, [events]);
 
     const getEventDateInWords = (eventDate) => {
         const date = parseISO(eventDate);
@@ -30,8 +35,23 @@ const EventCard = ({ event, cliente }) => {
         }
     };
 
-    const handleDeleteClick = () => {
+    const handleDeleteClick = async () => {
+        const { data, error } = await supabase
+            .from('events')
+            .update({ active: false })
+            .eq('id', event.id).select();
 
+        if (error) {
+            enqueueSnackbar('Error al eliminar el evento: ' + error.message, { variant: 'error' });
+        } else if (data && data.length > 0) {
+            enqueueSnackbar('Evento eliminado con éxito', { variant: 'success' });
+
+            // Actualiza el evento en el contexto
+            console.log(data[0])
+            setEvents(events.map(e =>
+                e.id === data[0].id ? data[0] : e
+            ));
+        }
     };
 
     const handleEditClick = () => {

@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { Grid, Typography, IconButton, Button, Modal } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
-import EditProducts from './EditProduct';
+import ProductCatalogo from './ProductCatalogo';
 import CreateProduct from './CreateProducts';
 import { Box, styled } from '@mui/system';
 import { supabase } from '../../../services/client';
@@ -12,7 +12,6 @@ import Slider from "react-slick";
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { AppContext } from '../../../AppContext';
-
 
 const Root = styled('div')(({ theme }) => ({
     marginBottom: theme.spacing(2),
@@ -44,17 +43,15 @@ const AddButton = styled(Button)(({ theme }) => ({
     width: 'fit-content',
 }));
 
-const EditCategory = ({ category, onDelete, business }) => {
-    const [productsint, setProductsint] = useState([]);
-    const [openModal, setOpenModal] = useState(false);
+const CategoryService = ({ category, onDelete, business }) => {
+	const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(false); // Nuevo estado para rastrear la carga
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const [currentProduct, setCurrentProduct] = useState(null);
+	const [currentProduct, setCurrentProduct] = useState(null);
 
-    const { products, setProducts } = useContext(AppContext);
+	const { products, setProducts, services } = useContext(AppContext);
 
-    const handleOpenModal = () => {
+	const handleOpenModal = () => {
         setOpenModal(true);
     };
 
@@ -62,7 +59,7 @@ const EditCategory = ({ category, onDelete, business }) => {
         setOpenModal(false);
     };
 
-    const handleAddProduct = async (product) => {
+	const handleAddProduct = async (product) => {
         setLoading(true);
         const { data, error } = await supabase
             .from('products')
@@ -168,51 +165,23 @@ const EditCategory = ({ category, onDelete, business }) => {
         ]
     });
 
-    useEffect(() => {
+	useEffect(() => {
 
-       setProductsint(products.filter(product => product.category === category.id))
-    }, [category.id, products]); // Dependencia de useEffect
+		// setProductsint(products.filter(product => product.category === category.id))
+	 }, [ products]); // Dependencia de useEffect
 
-    return (
-        <Root>
-            {loading ? (<Box><p>Creando Producto Nuevo, Espere ..</p><LoadingAnimation /></Box>) : (
-                <>
-                    <CategoryRow>
-                        <Box display={'flex'}>
-                            <CategoryName variant="h6">
-                                {category.nameProduct}
-                            </CategoryName>
-                            <IconButton>
-                                <Edit />
-                            </IconButton>
-                        </Box>
-                        <IconButton onClick={() => onDelete(category.id)}>
-                            <Delete color="error" />
-                        </IconButton>
-                    </CategoryRow>
-                    <AddButton variant="contained" onClick={handleOpenModal}>
-                        Agregar productos
-                    </AddButton>
-                    <Box sx={{ }}>
-                        <Slider {...getSliderSettings(2, 2, 1)}>
-                            {productsint.map((product) => (
-                                product && (
-                                    <Box p={1} key={product.id}>
-                                        <EditProducts product={product} openModal={handleOpenModal} setCurrentProduct={setCurrentProduct}/>
-                                    </Box>
-                                )
-                            ))}
-                        </Slider>
-                    </Box>
-                    <Modal open={openModal} onClose={handleCloseModal}>
-                        <div> <CreateProduct closeModal={handleCloseModal} createProduct={handleAddProduct} product={currentProduct}/>{}</div>
-                        {/* {console.log(product)} */}
-                        
-                    </Modal>
-                </>
-            )}
-        </Root>
-    );
+	return (
+		<div>
+			{/* <h1>{serviceName}</h1>
+			<p>Categoría: {category}</p>
+			<ul>
+				{options.map((option, index) => (
+					<li key={index}>{option}</li>
+				))}
+			</ul> */}
+			ovlbl
+		</div>
+	);
 };
 
-export default EditCategory;
+export default CategoryService;

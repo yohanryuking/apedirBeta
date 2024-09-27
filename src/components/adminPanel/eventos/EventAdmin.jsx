@@ -1,32 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Typography, Box } from '@mui/material';
 import { supabase } from '../../../services/client';
 import EventCard from './Events';
 import CreateEvent from './CreateEvent';
+import { AppContext } from '../../../AppContext';
 
 import { TroubleshootRounded } from '@mui/icons-material';
 
 import Slider from "react-slick";
 
 const EventAdmin = ({ business }) => {
-    const [events, setEvents] = useState([]);
+    const [eventsLoc, setEventsLoc] = useState([]);
+    const { events, setEvents } = useContext(AppContext);
 
     useEffect(() => {
-        const fetchEvents = async () => {
-            const { data, error } = await supabase
-                .from('events')
-                .select('*')
-                .eq('owner', business.name);
-
-            if (error) {
-                console.error('Error fetching events:', error);
-            } else {
-                setEvents(data);
-            }
-        };
-
-        fetchEvents();
-    }, [business]);
+        setEventsLoc(events.filter(event =>
+            event.owner === business.name)
+        );
+    }, [business, events]);
 
     const getSliderSettings = (slidesToShow, slidesToShow6, slidesToShow48) => ({
         dots: TroubleshootRounded,
@@ -42,7 +33,7 @@ const EventAdmin = ({ business }) => {
                 settings: {
                     slidesToShow: slidesToShow,
                     slidesToScroll: 1,
-                    infinite: true,
+                    infinite: events.length > 1,
                     dots: true
                 }
             },
@@ -66,16 +57,20 @@ const EventAdmin = ({ business }) => {
 
     return (
         <Box sx={{ maxWidth: { xs: '100vw', sm: '500px' } }}>
-            {events.length > 0 ? (
+            {eventsLoc.length === 0 ? (
+                <Typography variant="body1">No tienes eventos creados.</Typography>
+            ) : eventsLoc.length === 1 ? (
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <EventCard event={eventsLoc[0]} cliente={false} />
+                </Box>
+            ) : (
                 <Slider {...getSliderSettings(1.5, 1.5, 1)}>
-                    {events.map((event) => (
+                    {eventsLoc.map((event) => (
                         <div key={event.id}>
-                            <EventCard event={event} cliente={false}/>
+                            <EventCard event={event} cliente={false} />
                         </div>
                     ))}
                 </Slider>
-            ) : (
-                <Typography variant="body1">No tienes eventos creados.</Typography>
             )}
             <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 2 }}>
                 <CreateEvent business={business} />

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Typography, TextField, Button, Box } from '@mui/material';
 
-const CreateCategory = ({ addCategory, closeModal }) => { // Recibe las funciones como props
-
+const CreateCategory = ({ addCategory, closeModal, view }) => {
+ 
     const [category, setCategory] = useState(''); // Estado para el valor del campo de entrada
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        addCategory(category); // Llama a la función addCategory cuando se envía el formulario
+        addCategory(category, view); // Llama a la función addCategory cuando se envía el formulario
         console.log(category)
         closeModal();
     };

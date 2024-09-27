@@ -10,6 +10,7 @@ export const AppProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [categoryBusiness, setCategoryBusiness] = useState([]);
   const [cayegoryProducts, setCayegoryProducts] = useState([]);
+  const [categoryServices, setCategoryServices] = useState([]);
   const [events, setEvents] = useState([]);
   const [eventsRegister, setEventsRegister] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -104,6 +105,7 @@ export const AppProvider = ({ children }) => {
           }
         };
 
+
         const loadCayegoryProducts = async () => {
           const { data, error } = await supabase.from('cayegoryProducts').select('*');
           if (error) {
@@ -114,8 +116,21 @@ export const AppProvider = ({ children }) => {
           }
         };
 
+        const loadCategoryServices = async () => {
+          const { data, error } = await supabase.from('categoryServices').select('*');
+          if (error) {
+            console.error('Error loading categoryProducts:', error);
+          } else {
+            setCategoryServices(data);
+
+          }
+        };
+
         const loadEvents = async () => {
-          const { data, error } = await supabase.from('events').select('*');
+          const { data, error } = await supabase
+            .from('events')
+            .select('*')
+            .eq('active', true);
           if (error) {
             console.error('Error loading events:', error);
           } else {
@@ -208,6 +223,7 @@ export const AppProvider = ({ children }) => {
             loadUsers(),
             loadCategoryBusiness(),
             loadCayegoryProducts(),
+            loadCategoryServices(),
             loadEvents(),
             // loadEventsRegister(),
             // loadOrders(),
@@ -235,7 +251,7 @@ export const AppProvider = ({ children }) => {
   };
 
   return (
-    <AppContext.Provider value={{ products, setProducts, businesses, cart, users, categoryBusiness, cayegoryProducts, events, eventsRegister, orders, posts, updatePostInContext, sellsTotal, socialLinks, suscripciones, ventas, views, userId, userEmail, isUserDataLoaded, isAllDataLoaded }}>
+    <AppContext.Provider value={{ products, setProducts, businesses, cart, users, categoryBusiness, cayegoryProducts, categoryServices, setCategoryServices, events, setEvents, eventsRegister, orders, posts, updatePostInContext, sellsTotal, socialLinks, suscripciones, ventas, views, userId, userEmail, isUserDataLoaded, isAllDataLoaded }}>
       {children}
     </AppContext.Provider>
   );

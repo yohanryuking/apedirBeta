@@ -53,7 +53,7 @@ function App() {
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/event/:id" element={<EventClient />} />
             <Route path="/pruebas/:id" element={<Prueba />} />
-            <Route path="/business/:name" element={<PerfilNegocio />} />
+            <Route path="/:name" element={<PerfilNegocio />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

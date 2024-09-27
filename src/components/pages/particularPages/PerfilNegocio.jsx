@@ -3,11 +3,21 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AppContext } from '../../../AppContext';
 import LoadingAnimation from '../../utils/LoadingAnimation';
 import { Card, CardContent, CardMedia, Typography, Box, Button, TextField, IconButton, Avatar, Menu, MenuItem } from '@mui/material';
+// bulto de iconos
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
+import InfoIcon from '@mui/icons-material/Info'; // Cambiado aquí
+import CircleIcon from '@mui/icons-material/Circle';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import CheckIcon from '@mui/icons-material/Check';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+
+import Slider from 'react-slick';
+import ProductCard from '../../cards/ProductCardB';
+
 import { FacebookShareButton, TwitterShareButton, WhatsappShareButton } from 'react-share';
 import { useSnackbar } from 'notistack';
 
@@ -20,6 +30,13 @@ const PerfilNegocio = () => {
     const { businesses, categoryBusiness, cayegoryProducts, products } = useContext(AppContext);
     const [businessData, setBusinessData] = useState();
     const [anchorEl, setAnchorEl] = useState(null);
+
+    // estados del negocio
+    const [isOpen, setIsOpen] = useState(false); // Definir isOpen aquí
+    const [isSubscribed, setIsSubscribed] = useState(false); // Estado para suscripción
+    const [hasDelivery, setHasDelivery] = useState(false); // Estado para servicio de entrega
+
+
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
 
@@ -27,28 +44,33 @@ const PerfilNegocio = () => {
 
     useEffect(() => {
         if (!businesses) {
-            return <LoadingAnimation />;
+            return;
         }
 
         const business = businesses.find(business => String(business.name) === String(nombre));
-        const categoria = categoryBusiness.find(cat => cat.id === businessData.category);
-        setCategoriaB(categoria)
-        setBusinessData(business)
-
+        if (business) {
+            const categoria = categoryBusiness.find(cat => cat.id === business.category);
+            setCategoriaB(categoria);
+            setBusinessData(business);
+        }
     }, [nombre, businesses, categoryBusiness]);
 
     useEffect(() => {
         if (businessData) {
             const seccion = cayegoryProducts.filter(cat => cat.owner === businessData.name);
-            console.log(seccion)
-            setSecciones(seccion)
+            setSecciones(seccion);
 
             const produ = products.filter(pro => pro.owner === businessData.name);
-            console.log(produ);
-            setProductos(produ)
+            setProductos(produ);
         }
+    }, [businessData, cayegoryProducts, products]);
 
-    }, [cayegoryProducts, products]);
+    useEffect(() => {
+        const currentHour = new Date().getHours();
+        const openHour = 9;
+        const closeHour = 21;
+        setIsOpen(currentHour >= openHour && currentHour < closeHour);
+    }, []);
 
 
     // funciones para compartir
@@ -84,7 +106,43 @@ const PerfilNegocio = () => {
             .catch((error) => console.error('Error al copiar el enlace', error));
     };
 
+    const handleInfoClick = () => {
+        // Implementar la función aquí
+    };
 
+    const handleSubscribeClick = () => {
+        setIsSubscribed(!isSubscribed);
+    };
+
+    const sliderSettings = {
+        // dots: true,
+        infinite: false,
+        speed: 500,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                    // infinite: true,
+                    // dots: true
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                    // infinite: true,
+                    // dots: true,
+                    // centerMode: true,
+                    centerPadding: '20px'
+                }
+            }
+        ]
+    };
 
     if (!businessData) {
         return <LoadingAnimation />;
@@ -129,22 +187,50 @@ const PerfilNegocio = () => {
                 </Box>
                 <CardMedia component="img" sx={{ flex: '0 1 auto', transition: 'height 0.2s ease', minHeight: '30%', borderRadius: '15px', boxShadow: '1px 1px 3px black' }} image={businessData.photo_portada} alt="Imagen del evento" />
                 <Avatar src={businessData.photo_perfil} sx={{ width: 65, height: 65, transform: 'translateY(-50%)', margin: '0 auto', border: 'solid 3px white' }} />
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <Typography variant="h3">{businessData.name}</Typography>
-                    <Typography variant="h3">{categoriaB?.nameCategory}</Typography>
-                </Box>
-                <Box>
-                    {secciones?.map((seccion) => (
-                        <div key={seccion.id}>
-                            <Typography variant="h6">{seccion.nameProduct}</Typography>
-                            {productos?.filter(producto => producto?.category === seccion.id).map((producto) => (
-                                <div key={producto?.id}>
-                                    <Typography variant="body1">{producto?.name}</Typography>
-                                    {/* Aquí puedes mostrar más detalles del producto si lo deseas */}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
+
+                <Box sx={{ padding: '20px' }}>
+                    {/* box con nombre e info del negocio */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+                            <Typography variant="body1" style={{ color: 'gray', display: 'flex', alignItems: 'center' }}>
+                                {isOpen ? 'Abierto' : 'Cerrado'}
+                                <CircleIcon sx={{ color: isOpen ? 'green' : 'red', marginLeft: '5px', width: '10px' }} />
+                            </Typography>
+                            <IconButton onClick={handleInfoClick} style={{ color: 'black' }}>
+                                <InfoIcon />
+                            </IconButton>
+                        </Box>
+                        <Typography variant="h3">{businessData.name}</Typography>
+                        <Typography variant="h6" style={{ color: 'gray' }}>{categoriaB?.nameCategory}</Typography>
+                    </Box>
+
+                    {/* box con opcion de suscribirse y si tiene deliveri o no  */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSubscribeClick}
+                            endIcon={isSubscribed ? <CheckIcon /> : <NotificationsIcon />}
+                            sx={{ backgroundColor: 'purple', borderRadius: '13px' }}
+                        >
+                            {isSubscribed ? 'Suscrito' : 'Suscríbete'}
+                        </Button>
+                        {hasDelivery && <LocalShippingIcon sx={{ color: 'black' }} />}
+                    </Box>
+
+                    {/* box con catalogo de productos y servicos del negocio */}
+                    <Box sx={{ marginTop: '20px' }}>
+                        {secciones?.map((seccion) => (
+                            <div key={seccion.id}>
+                                <Typography variant="h6">{seccion.nameProduct}</Typography>
+                                <Slider {...sliderSettings}>
+                                    {productos?.filter(producto => producto?.category === seccion.id).map((producto) => (
+                                        <ProductCard key={producto?.id} product={producto} />
+                                    ))}
+                                </Slider>
+                            </div>
+                        ))}
+                    </Box>
                 </Box>
             </Card>
         </Box>

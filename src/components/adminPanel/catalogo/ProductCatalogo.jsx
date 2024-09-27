@@ -8,7 +8,7 @@ import { useSnackbar } from 'notistack';
 
 
 
-const EditProduct = ({ product, openModal, setCurrentProduct }) => {
+const ProductCatalogo = ({ product, openModal, setCurrentProduct }) => {
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [productImage, setProductImage] = useState(product.image_url);
 
@@ -97,4 +97,4 @@ const EditProduct = ({ product, openModal, setCurrentProduct }) => {
     );
 };
 
-export default EditProduct;
+export default ProductCatalogo;
