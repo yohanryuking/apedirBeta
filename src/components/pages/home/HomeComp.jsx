@@ -5,7 +5,7 @@ import SearchBar from '../../utils/SearchBar'; // Asegúrate de que la ruta sea 
 // import ProvinceSelected from '../../utils/ProvinceSelected'; // Asegúrate de que la ruta sea correcta
 import { supabase } from '../../../services/client';
 import ProductCard from '../../cards/Products';
-import BusinessCard from '../../cards/Business';
+import BusinessCard from '../../cards/BusinessCard';
 import Category from '../../adminPanel/catalogo/Category';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';

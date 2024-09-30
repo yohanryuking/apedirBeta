@@ -1,25 +1,25 @@
 import { useEffect, useState, useContext, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { AppContext } from '../../../AppContext';
 import LoadingAnimation from '../../utils/LoadingAnimation';
-import { Card, CardContent, CardMedia, Typography, Box, Button, TextField, IconButton, Avatar, Menu, MenuItem } from '@mui/material';
+import { Card, CardMedia, Typography, Box, Button, IconButton, Avatar, Modal, Paper, useMediaQuery } from '@mui/material';
 // bulto de iconos
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import ShareIcon from '@mui/icons-material/Share';
 import InfoIcon from '@mui/icons-material/Info'; // Cambiado aquí
 import CircleIcon from '@mui/icons-material/Circle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import CheckIcon from '@mui/icons-material/Check';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
 
 import Slider from 'react-slick';
-import ProductCard from '../../cards/ProductCardB';
-
-import { FacebookShareButton, TwitterShareButton, WhatsappShareButton } from 'react-share';
+import ProductCardB from '../../cards/ProductCardB';
+import { supabase } from '../../../services/client';
+import TopBar from '../../utils/TopBar';
 import { useSnackbar } from 'notistack';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
+
 
 const PerfilNegocio = () => {
     const { name: nombre } = useParams();
@@ -27,20 +27,19 @@ const PerfilNegocio = () => {
     const [secciones, setSecciones] = useState(null);
     const [productos, setProductos] = useState(null);
 
-    const { businesses, categoryBusiness, cayegoryProducts, products } = useContext(AppContext);
+    const { businesses, categoryBusiness, cayegoryProducts, suscripciones, products, userId } = useContext(AppContext);
     const [businessData, setBusinessData] = useState();
-    const [anchorEl, setAnchorEl] = useState(null);
-
     // estados del negocio
     const [isOpen, setIsOpen] = useState(false); // Definir isOpen aquí
     const [isSubscribed, setIsSubscribed] = useState(false); // Estado para suscripción
     const [hasDelivery, setHasDelivery] = useState(false); // Estado para servicio de entrega
-
+    const [showInfoModal, setShowInfoModal] = useState(false);
+    const [showScheduleBox, setShowScheduleBox] = useState(false);
+    const isMobile = useMediaQuery('(max-width:600px)');
 
     const { enqueueSnackbar } = useSnackbar();
-    const navigate = useNavigate();
 
-    const shareButtonRef = useRef(); // Añade esta línea
+
 
     useEffect(() => {
         if (!businesses) {
@@ -62,56 +61,75 @@ const PerfilNegocio = () => {
 
             const produ = products.filter(pro => pro.owner === businessData.name);
             setProductos(produ);
+
+            // Verificar si el usuario ya está suscrito
+            const suscripcion = suscripciones.find(sub => sub.user_id === userId && sub.business_id === businessData.id);
+            if (suscripcion) {
+                setIsSubscribed(true);
+            }
+
+            // Verificar si el negocio está abierto
+            setIsOpen(checkIfOpen(businessData.schedules));
         }
-    }, [businessData, cayegoryProducts, products]);
+    }, [businessData, cayegoryProducts, products, suscripciones, userId]);
 
-    useEffect(() => {
-        const currentHour = new Date().getHours();
-        const openHour = 9;
-        const closeHour = 21;
-        setIsOpen(currentHour >= openHour && currentHour < closeHour);
-    }, []);
+    const checkIfOpen = (schedule) => {
+        const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const currentDay = daysOfWeek[new Date().getDay()];
+        const currentTime = dayjs();
 
+        if (schedule[currentDay]) {
+            const openingTime = dayjs(schedule[currentDay].opening, 'HH:mm');
+            const closingTime = dayjs(schedule[currentDay].closing, 'HH:mm');
 
-    // funciones para compartir
-    const handleBackClick = () => {
-        navigate(-1);
-    };
-    const handleShareClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-    const handleShare = () => {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Compartir Negocio',
-                text: 'Mira la pagina de ' + businessData.name + ' en APEDIR!',
-                url: window.location.href,
-            })
-                .then(() => console.log('Contenido compartido!'))
-                .catch((error) => console.log('Hubo un error al compartir', error));
-        } else {
-            console.log('La API Web Share no está disponible en tu navegador');
-            handleShareClick({ currentTarget: shareButtonRef.current }); // Añade esta línea
+            return currentTime.isAfter(openingTime) && currentTime.isBefore(closingTime);
         }
-    };
-    const handleCopyLink = () => {
-        navigator.clipboard.writeText(window.location.href)
-            .then(() => {
-                enqueueSnackbar('Enlace copiado al portapapeles', { variant: 'success' });
-                handleClose();
-            })
-            .catch((error) => console.error('Error al copiar el enlace', error));
+
+        return false;
     };
 
     const handleInfoClick = () => {
-        // Implementar la función aquí
+        setShowInfoModal(true);
     };
 
-    const handleSubscribeClick = () => {
-        setIsSubscribed(!isSubscribed);
+    const handleSubscribeClick = async () => {
+        if (isSubscribed) {
+            // Lógica para desuscribirse
+            try {
+                const { data, error } = await supabase
+                    .from('suscripciones')
+                    .delete()
+                    .eq('user_id', userId)
+                    .eq('business_id', businessData.id);
+                if (error) {
+                    console.error('Error al desuscribirse:', error);
+                    enqueueSnackbar('Error al desuscribirse', { variant: 'error' });
+                } else {
+                    setIsSubscribed(false);
+                    enqueueSnackbar('Desuscripción exitosa', { variant: 'success' });
+                }
+            } catch (error) {
+                console.error('Error al desuscribirse:', error);
+                enqueueSnackbar('Error al desuscribirse', { variant: 'error' });
+            }
+        } else {
+            // Lógica para suscribirse
+            try {
+                const { data, error } = await supabase
+                    .from('suscripciones')
+                    .insert([{ user_id: userId, business_id: businessData.id }]);
+                if (error) {
+                    console.error('Error al suscribirse:', error);
+                    enqueueSnackbar('Error al suscribirse', { variant: 'error' });
+                } else {
+                    setIsSubscribed(true);
+                    enqueueSnackbar('Suscripción exitosa', { variant: 'success' });
+                }
+            } catch (error) {
+                console.error('Error al suscribirse:', error);
+                enqueueSnackbar('Error al suscribirse', { variant: 'error' });
+            }
+        }
     };
 
     const sliderSettings = {
@@ -151,40 +169,7 @@ const PerfilNegocio = () => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
             <Card sx={{ display: 'flex', flexDirection: 'column', width: { xs: '100vw', sm: '500px' }, minHeight: '100%', borderTopRightRadius: '15px', overflow: 'auto' }}>
-                <Box sx={{ position: 'relative' }}>
-                    <Box sx={{ position: 'absolute', top: 20, left: 20, display: 'flex' }}>
-                        <IconButton sx={{ borderRadius: '50%', background: 'white' }}><ArrowBackIcon onClick={handleBackClick} /></IconButton>
-                    </Box>
-                    <Box sx={{ position: 'absolute', top: 20, right: 10, display: 'flex', gap: '5px' }}>
-                        <IconButton sx={{ borderRadius: '50%', background: 'white' }}><FavoriteIcon /></IconButton>
-                        <IconButton ref={shareButtonRef} sx={{ borderRadius: '50%', background: 'white' }} onClick={handleShare}><ShareIcon /></IconButton>
-                        <Menu
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleClose}
-                        >
-                            <MenuItem onClick={handleClose}>
-                                <FacebookShareButton url={window.location.href} quote={'Mira la pagina de ' + businessData.name + ' en APEDIR!'} >
-                                    Compartir en Facebook
-                                </FacebookShareButton>
-                            </MenuItem>
-                            <MenuItem onClick={handleClose}>
-                                <TwitterShareButton url={window.location.href} title={'Mira la pagina de ' + businessData.name + ' en APEDIR!'} >
-                                    Compartir en X
-                                </TwitterShareButton>
-                            </MenuItem>
-                            <MenuItem onClick={handleClose}>
-                                <WhatsappShareButton url={window.location.href} title={'Mira la pagina de ' + businessData.name + ' en APEDIR!'} >
-                                    Compartir en WhatsApp
-                                </WhatsappShareButton>
-                            </MenuItem>
-                            <MenuItem onClick={handleCopyLink}>
-                                Copiar enlace
-                            </MenuItem>
-                        </Menu>
-                    </Box>
-                </Box>
+                <TopBar title={businessData.name} showFavorite={false} />
                 <CardMedia component="img" sx={{ flex: '0 1 auto', transition: 'height 0.2s ease', minHeight: '30%', borderRadius: '15px', boxShadow: '1px 1px 3px black' }} image={businessData.photo_portada} alt="Imagen del evento" />
                 <Avatar src={businessData.photo_perfil} sx={{ width: 65, height: 65, transform: 'translateY(-50%)', margin: '0 auto', border: 'solid 3px white' }} />
 
@@ -192,7 +177,13 @@ const PerfilNegocio = () => {
                     {/* box con nombre e info del negocio */}
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
-                            <Typography variant="body1" style={{ color: 'gray', display: 'flex', alignItems: 'center' }}>
+                            <Typography
+                                variant="body1"
+                                style={{ color: 'gray', display: 'flex', alignItems: 'center' }}
+                                onMouseEnter={() => !isMobile && setShowScheduleBox(true)}
+                                onMouseLeave={() => !isMobile && setShowScheduleBox(false)}
+                                onClick={() => isMobile && setShowScheduleBox(!showScheduleBox)}
+                            >
                                 {isOpen ? 'Abierto' : 'Cerrado'}
                                 <CircleIcon sx={{ color: isOpen ? 'green' : 'red', marginLeft: '5px', width: '10px' }} />
                             </Typography>
@@ -220,19 +211,77 @@ const PerfilNegocio = () => {
 
                     {/* box con catalogo de productos y servicos del negocio */}
                     <Box sx={{ marginTop: '20px' }}>
-                        {secciones?.map((seccion) => (
-                            <div key={seccion.id}>
-                                <Typography variant="h6">{seccion.nameProduct}</Typography>
-                                <Slider {...sliderSettings}>
-                                    {productos?.filter(producto => producto?.category === seccion.id).map((producto) => (
-                                        <ProductCard key={producto?.id} product={producto} />
-                                    ))}
-                                </Slider>
-                            </div>
-                        ))}
+                        {secciones?.map((seccion) => {
+                            const productosFiltrados = productos?.filter(producto => producto?.category === seccion.id);
+                            if (productosFiltrados.length === 0) {
+                                return null;
+                            }
+                            return (
+                                <div key={seccion.id}>
+                                    <Typography variant="h6">{seccion.nameProduct}</Typography>
+                                    <Slider {...sliderSettings}>
+                                        {productosFiltrados.map((producto) => (
+                                            <ProductCardB key={producto?.id} product={producto} userId={userId} />
+                                        ))}
+                                    </Slider>
+                                </div>
+                            );
+                        })}
                     </Box>
                 </Box>
             </Card>
+
+            <Modal
+                open={showInfoModal}
+                onClose={() => setShowInfoModal(false)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 400,
+                    bgcolor: 'background.paper',
+                    border: '2px solid #000',
+                    boxShadow: 24,
+                    p: 4,
+                }}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        {businessData.name}
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        {businessData.description}
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Dirección: {businessData.address}
+                    </Typography>
+                </Box>
+            </Modal>
+
+            {showScheduleBox && (
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '20%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        padding: '10px',
+                        zIndex: 10,
+                        backgroundColor: 'white',
+                        boxShadow: 3,
+                    }}
+                    onClick={() => isMobile && setShowScheduleBox(false)}
+                >
+                    <Typography variant="h6">Horarios</Typography>
+                    {Object.entries(businessData.schedules).map(([day, schedule]) => (
+                        <Typography key={day} variant="body2">
+                            {day}: {schedule.opening} - {schedule.closing}
+                        </Typography>
+                    ))}
+                </Paper>
+            )}
         </Box>
 
     );

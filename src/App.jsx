@@ -40,7 +40,12 @@ function App() {
 
   return (
     <>
-      <SnackbarProvider maxSnack={3}>
+       <SnackbarProvider
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
         <AppProvider>
           <CssBaseline />
           <Routes>
@@ -58,7 +63,7 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppProvider>
-      </SnackbarProvider>
+        </SnackbarProvider>
     </>
   )
 }

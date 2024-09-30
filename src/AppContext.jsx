@@ -188,6 +188,15 @@ export const AppProvider = ({ children }) => {
           }
         };
 
+        const loadSuscripciones = async () => {
+          const { data, error } = await supabase.from('suscripciones').select('*');
+          if (error) {
+            console.error('Error loading suscripciones:', error);
+          } else {
+            setSuscripciones(data);
+          }
+        };
+
         // const loadSuscripciones = async () => {
         //   const { data, error } = await supabase.from('suscripciones').select('*');
         //   if (error) {
@@ -230,7 +239,7 @@ export const AppProvider = ({ children }) => {
             loadPosts(),
             // loadSellsTotal(),
             loadSocialLinks(),
-            // loadSuscripciones(),
+            loadSuscripciones(),
             // loadVentas(),
             // loadViews(),
           ]);
@@ -251,7 +260,32 @@ export const AppProvider = ({ children }) => {
   };
 
   return (
-    <AppContext.Provider value={{ products, setProducts, businesses, cart, users, categoryBusiness, cayegoryProducts, categoryServices, setCategoryServices, events, setEvents, eventsRegister, orders, posts, updatePostInContext, sellsTotal, socialLinks, suscripciones, ventas, views, userId, userEmail, isUserDataLoaded, isAllDataLoaded }}>
+    <AppContext.Provider value={{ 
+      products, 
+      setProducts, 
+      businesses, 
+      cart, 
+      users, 
+      categoryBusiness, 
+      cayegoryProducts, 
+      categoryServices, 
+      setCategoryServices, 
+      events, 
+      setEvents, 
+      eventsRegister, 
+      orders, 
+      posts, 
+      updatePostInContext, 
+      sellsTotal, 
+      socialLinks, 
+      suscripciones, // Añadir esta línea
+      ventas, 
+      views, 
+      userId, 
+      userEmail, 
+      isUserDataLoaded, 
+      isAllDataLoaded 
+    }}>
       {children}
     </AppContext.Provider>
   );

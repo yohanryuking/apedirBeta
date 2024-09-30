@@ -1,10 +1,18 @@
 import React from 'react';
 import { Card, CardContent, CardMedia, Typography, Avatar } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
 
 const BusinessCard = ({ business }) => {
+    const navigate = useNavigate();
+
+    const handleCardClick = () => {
+        navigate(`/${business.name}`);
+    };
 
     return (
-        <Card sx={{ position: 'relative', height: 100, width: 150, borderRadius: 1, overflow: 'hidden' }}>
+        <Card sx={{ position: 'relative', height: 100, width: 150, borderRadius: 1, overflow: 'hidden' }}
+            onClick={handleCardClick}>
             <CardMedia
                 sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.5 }}
                 image={business?.photo_portada}

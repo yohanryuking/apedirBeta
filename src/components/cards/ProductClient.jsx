@@ -47,7 +47,15 @@ const ProductClient = ({ addToCart }) => {
                 </IconButton>
             </Box>
             <Card>
-                <CardMedia image={product.image} /> {/* Muestra la imagen del producto */}
+                <CardMedia
+                    image={product.image}
+                    style={{
+                        height: 0,
+                        paddingTop: '56.25%', // Relación de aspecto 16:9
+                        objectFit: 'cover',
+                        objectPosition: 'center'
+                    }}
+                />
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="body2">{product.category}</Typography> {/* Muestra la categoría del producto */}
                     <Box display="flex" alignItems="center">

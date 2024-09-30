@@ -19,6 +19,7 @@
     "@mui/system": "^5.15.15",
     "@supabase/supabase-js": "^2.42.0",
     "date-fns": "^3.6.0",
+    "dayjs": "^1.11.13",
     "l": "^0.6.0",
     "moment": "^2.30.1",
     "notistack": "^3.0.1",
