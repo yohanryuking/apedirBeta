@@ -27,7 +27,7 @@ const PerfilNegocio = () => {
     const [secciones, setSecciones] = useState(null);
     const [productos, setProductos] = useState(null);
 
-    const { businesses, categoryBusiness, cayegoryProducts, suscripciones, products, userId } = useContext(AppContext);
+    const { businesses, categoryBusiness, categoryProducts, suscripciones, products, userId } = useContext(AppContext);
     const [businessData, setBusinessData] = useState();
     // estados del negocio
     const [isOpen, setIsOpen] = useState(false); // Definir isOpen aquí
@@ -56,7 +56,7 @@ const PerfilNegocio = () => {
 
     useEffect(() => {
         if (businessData) {
-            const seccion = cayegoryProducts.filter(cat => cat.owner === businessData.name);
+            const seccion = categoryProducts.filter(cat => cat.owner === businessData.name);
             setSecciones(seccion);
 
             const produ = products.filter(pro => pro.owner === businessData.name);
@@ -71,7 +71,7 @@ const PerfilNegocio = () => {
             // Verificar si el negocio está abierto
             setIsOpen(checkIfOpen(businessData.schedules));
         }
-    }, [businessData, cayegoryProducts, products, suscripciones, userId]);
+    }, [businessData, categoryProducts, products, suscripciones, userId]);
 
     const checkIfOpen = (schedule) => {
         const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];

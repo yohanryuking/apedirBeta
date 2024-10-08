@@ -45,7 +45,7 @@ const ProductPage = () => {
             setTotal(count * productData.precio);
 
             const { data: categoryData, error: categoryError } = await supabase
-                .from('cayegoryProducts')
+                .from('categoryProducts')
                 .select('*')
                 .eq('id', productData.category)
                 .single();
@@ -185,31 +185,33 @@ const ProductPage = () => {
                             </Box>
                         </Box>
                     </Box>
-                    <Box sx={{ flex: '1 1', padding: isMobile ? '20px 10px' : '0 20px' }}>
+                    <Box sx={{ padding: isMobile ? '20px 10px' : '0 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '0 auto', gap: '30px' }}>
                         <Typography variant="h3">{product.name}</Typography>
-                        <Typography variant="body1" height={'100px'}>{product.description}</Typography>
+                        {/* <Typography variant="body1" height={'100px'}>{product.description}</Typography> */}
+                        {cartItem ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', gap: '30px' }}>
+                                <IconButton onClick={decrementCount} sx={{ backgroundColor: '#e5e5e5', borderRadius: '10px' }}>
+                                    <RemoveIcon />
+                                </IconButton>
+                                <Typography variant='h5'>{count}</Typography>
+                                <IconButton onClick={incrementCount} sx={{ backgroundColor: '#e5e5e5', borderRadius: '10px' }}>
+                                    <AddIcon />
+                                </IconButton>
+                            </Box>
+                        ) : (
+                            <Box sx={{ display: 'flex', alignItems: 'center', margin: '0 auto', gap: '30px' }}>
+                                <IconButton onClick={decrementCount} sx={{ backgroundColor: '#e5e5e5', borderRadius: '10px' }}>
+                                    <RemoveIcon />
+                                </IconButton>
+                                <Typography variant='h5'>{count}</Typography>
+                                <IconButton onClick={incrementCount} sx={{ backgroundColor: '#e5e5e5', borderRadius: '10px' }}>
+                                    <AddIcon />
+                                </IconButton>
+                            </Box>
+                        )}
+                        <Typography variant="body1" height={'100px'}>The McDonald Double Cheeseburger features two 100% pure at beef patties seasored whith just a pinch of small ......</Typography>
                     </Box>
-                    {cartItem ? (
-                        <Box sx={{ display: 'flex', alignItems: 'center', margin: '0 auto', gap: '30px' }}>
-                            <IconButton onClick={decrementCount} sx={{ backgroundColor: '#e5e5e5', borderRadius: '10px' }}>
-                                <RemoveIcon />
-                            </IconButton>
-                            <Typography variant='h5'>{count}</Typography>
-                            <IconButton onClick={incrementCount} sx={{ backgroundColor: '#e5e5e5', borderRadius: '10px' }}>
-                                <AddIcon />
-                            </IconButton>
-                        </Box>
-                    ) : (
-                        <Box sx={{ display: 'flex', alignItems: 'center', margin: '0 auto', gap: '30px' }}>
-                            <IconButton onClick={decrementCount} sx={{ backgroundColor: '#e5e5e5', borderRadius: '10px' }}>
-                                <RemoveIcon />
-                            </IconButton>
-                            <Typography variant='h5'>{count}</Typography>
-                            <IconButton onClick={incrementCount} sx={{ backgroundColor: '#e5e5e5', borderRadius: '10px' }}>
-                                <AddIcon />
-                            </IconButton>
-                        </Box>
-                    )}
+
                 </Box>
             </Box>
             <Box sx={{

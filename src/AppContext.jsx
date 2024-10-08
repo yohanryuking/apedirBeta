@@ -5,11 +5,12 @@ export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
+  const [services, setServices] = useState([]);
   const [businesses, setBusinesses] = useState([]);
   const [cart, setCart] = useState([]);
   const [users, setUsers] = useState([]);
   const [categoryBusiness, setCategoryBusiness] = useState([]);
-  const [cayegoryProducts, setCayegoryProducts] = useState([]);
+  const [categoryProducts, setCategoryProducts] = useState([]);
   const [categoryServices, setCategoryServices] = useState([]);
   const [events, setEvents] = useState([]);
   const [eventsRegister, setEventsRegister] = useState([]);
@@ -53,6 +54,16 @@ export const AppProvider = ({ children }) => {
             console.error('Error loading products:', error);
           } else {
             setProducts(data);
+            console.log(data)
+          }
+        };
+
+        const loadServices = async () => {
+          const { data, error } = await supabase.from('services').select('*');
+          if (error) {
+            console.error('Error loading services:', error);
+          } else {
+            setServices(data);
             console.log(data)
           }
         };
@@ -106,12 +117,12 @@ export const AppProvider = ({ children }) => {
         };
 
 
-        const loadCayegoryProducts = async () => {
-          const { data, error } = await supabase.from('cayegoryProducts').select('*');
+        const loadcategoryProducts = async () => {
+          const { data, error } = await supabase.from('categoryProducts').select('*');
           if (error) {
             console.error('Error loading categoryProducts:', error);
           } else {
-            setCayegoryProducts(data);
+            setCategoryProducts(data);
 
           }
         };
@@ -227,11 +238,12 @@ export const AppProvider = ({ children }) => {
         try {
           await Promise.all([
             loadProducts(),
+            loadServices(),
             loadBusinesses(),
             loadCart(),
             loadUsers(),
             loadCategoryBusiness(),
-            loadCayegoryProducts(),
+            loadcategoryProducts(),
             loadCategoryServices(),
             loadEvents(),
             // loadEventsRegister(),
@@ -260,31 +272,35 @@ export const AppProvider = ({ children }) => {
   };
 
   return (
-    <AppContext.Provider value={{ 
-      products, 
-      setProducts, 
-      businesses, 
-      cart, 
-      users, 
-      categoryBusiness, 
-      cayegoryProducts, 
-      categoryServices, 
-      setCategoryServices, 
-      events, 
-      setEvents, 
-      eventsRegister, 
-      orders, 
-      posts, 
-      updatePostInContext, 
-      sellsTotal, 
-      socialLinks, 
+    <AppContext.Provider value={{
+      products,
+      setProducts,
+      services,
+      setServices,  
+      businesses,
+      cart,
+      users,
+      categoryBusiness,
+      setCategoryBusiness,
+      categoryProducts,
+      setCategoryProducts,
+      categoryServices,
+      setCategoryServices,
+      events,
+      setEvents,
+      eventsRegister,
+      orders,
+      posts,
+      updatePostInContext,
+      sellsTotal,
+      socialLinks,
       suscripciones, // Añadir esta línea
-      ventas, 
-      views, 
-      userId, 
-      userEmail, 
-      isUserDataLoaded, 
-      isAllDataLoaded 
+      ventas,
+      views,
+      userId,
+      userEmail,
+      isUserDataLoaded,
+      isAllDataLoaded
     }}>
       {children}
     </AppContext.Provider>

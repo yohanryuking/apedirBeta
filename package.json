@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@date-io/date-fns": "^3.0.0",
     "@emotion/styled": "^11.11.5",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
@@ -17,6 +18,7 @@
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "^5.15.15",
     "@mui/system": "^5.15.15",
+    "@mui/x-date-pickers": "^7.19.0",
     "@supabase/supabase-js": "^2.42.0",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
@@ -26,9 +28,11 @@
     "qrcode": "^1.5.3",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
+    "react-datepicker": "^7.4.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
     "react-minimal-pie-chart": "^8.4.0",
+    "react-qr-code": "^2.0.15",
     "react-router-dom": "^6.22.3",
     "react-share": "^5.1.0",
     "react-slick": "^0.30.2",

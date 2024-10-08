@@ -1,8 +1,8 @@
 import { useEffect, useState, useContext } from 'react';
 import { Grid, Typography, IconButton, Button, Modal } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
-import ProductCatalogo from './ProductCatalogo';
-import CreateProduct from './CreateProducts';
+import ServiceCatalogo from './ServiceCatalogo';
+import CreateService from './CreateService';
 import { Box, styled } from '@mui/system';
 import { supabase } from '../../../services/client';
 import LoadingAnimation from '../../utils/LoadingAnimation';
@@ -12,6 +12,7 @@ import Slider from "react-slick";
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { AppContext } from '../../../AppContext';
+import { useSnackbar } from 'notistack';
 
 const Root = styled('div')(({ theme }) => ({
     marginBottom: theme.spacing(2),
@@ -44,14 +45,15 @@ const AddButton = styled(Button)(({ theme }) => ({
 }));
 
 const CategoryService = ({ category, onDelete, business }) => {
-	const [openModal, setOpenModal] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(false); // Nuevo estado para rastrear la carga
     const theme = useTheme();
-	const [currentProduct, setCurrentProduct] = useState(null);
+    const [currentService, setCurrentService] = useState(null);
 
-	const { products, setProducts, services } = useContext(AppContext);
+    const { services, setServices } = useContext(AppContext);
+    const { enqueueSnackbar } = useSnackbar();
 
-	const handleOpenModal = () => {
+    const handleOpenModal = () => {
         setOpenModal(true);
     };
 
@@ -59,43 +61,65 @@ const CategoryService = ({ category, onDelete, business }) => {
         setOpenModal(false);
     };
 
-	const handleAddProduct = async (product) => {
+    const handleAddService = async (service) => {
         setLoading(true);
         const { data, error } = await supabase
-            .from('products')
+            .from('services')
             .insert([{
-                'name': product.name,
-                'owner': business.name,
+                'name': service.name,
+                'owner': business.id, // Usar el ID del negocio
                 'category': category.id,
-                'provincia': business.provincia,
-                'precio': product.price
-            }]);
+                'price': service.price
+            }])
+            .select();
 
         if (error) {
-            console.log('Error inserting product:', error);
+            console.log('Error inserting service:', error);
+            enqueueSnackbar('Error al agregar el servicio', { variant: 'error' });
             setLoading(false);
         } else {
-            // console.log(product.image)
-            setProducts([...products, data]);
-            // handleCloseModal();
-            // Si la creación del producto fue exitosa, sube la imagen al bucket
-            if (product.image) {
-                const filePath = `${business.name}/products/${product.name}.jpg`;
+            const newService = data[0];
+            const serviceId = newService.id;
+
+            // Insertar horarios
+            const schedulePromises = service.schedules.map(schedule => {
+                return supabase
+                    .from('service_schedules')
+                    .insert([{
+                        'service_id': serviceId,
+                        'day': schedule.day,
+                        'start_time': schedule.start_time,
+                        'end_time': schedule.end_time
+                    }]);
+            });
+
+            const scheduleResults = await Promise.all(schedulePromises);
+            const scheduleErrors = scheduleResults.filter(result => result.error);
+
+            if (scheduleErrors.length > 0) {
+                console.log('Error inserting schedules:', scheduleErrors);
+                enqueueSnackbar('Error al agregar los horarios del servicio', { variant: 'error' });
+                setLoading(false);
+                return;
+            }
+
+            setServices([...services, newService]);
+            enqueueSnackbar('Servicio agregado exitosamente', { variant: 'success' });
+            setLoading(false);
+            setOpenModal(false);
+
+            if (service.image) {
+                const filePath = `${business.name}/services/${service.name}.jpg`;
 
                 const { data: uploadData, error: uploadError } = await supabase
                     .storage
                     .from('feedImages')
-                    .upload(filePath, product.image, { upsert: true });
+                    .upload(filePath, service.image, { upsert: true });
 
                 if (uploadError) {
                     console.error('Error uploading image:', uploadError.message);
-                    toast.error('Error uploading image: ' + uploadError.message);
-                    setLoading(false);
+                    enqueueSnackbar('Error al subir la imagen: ' + uploadError.message, { variant: 'error' });
                 } else {
-                    console.log('Image uploaded successfully:', uploadData);
-                    // toast.success('Image uploaded successfully');
-
-                    // Obtén la URL de la imagen
                     const { data: urlData, error: urlError } = await supabase
                         .storage
                         .from('feedImages')
@@ -103,25 +127,19 @@ const CategoryService = ({ category, onDelete, business }) => {
 
                     if (urlError) {
                         console.error('Error getting image URL:', urlError.message);
-                        // toast.error('Error getting image URL: ' + urlError.message);
-                        setLoading(false);
+                        enqueueSnackbar('Error al obtener la URL de la imagen: ' + urlError.message, { variant: 'error' });
                     } else {
-                        console.log(urlData)
-                        // Actualiza el evento con la URL de la imagen
-
                         const { data, error: updateError } = await supabase
-                            .from('products')
+                            .from('services')
                             .update({ 'image_url': urlData.publicUrl })
-                            .eq('name', product.name)
-                            .select()
+                            .eq('id', serviceId)
+                            .select();
+
                         if (updateError) {
-                            console.error('Error updating event:', updateError.message);
-                            // toast.error('Error updating event: ' + updateError.message);
-                            setLoading(false);
+                            console.error('Error updating service:', updateError.message);
+                            enqueueSnackbar('Error al actualizar el servicio: ' + updateError.message, { variant: 'error' });
                         } else {
-                            console.log('Event updated successfully with image URL');
-                            // toast.success('Event updated successfully with image URL');
-                            setLoading(false);
+                            enqueueSnackbar('Servicio actualizado exitosamente con la URL de la imagen', { variant: 'success' });
                         }
                     }
                 }
@@ -129,9 +147,24 @@ const CategoryService = ({ category, onDelete, business }) => {
         }
     };
 
+    const handleDeleteService = async (id) => {
+        const { error } = await supabase
+            .from('services')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            console.log('Error deleting service:', error);
+            enqueueSnackbar('Error al eliminar el servicio', { variant: 'error' });
+        } else {
+            setServices(services.filter(service => service.id !== id));
+            enqueueSnackbar('Servicio eliminado exitosamente', { variant: 'success' });
+        }
+    };
+
     const getSliderSettings = (slidesToShow, slidesToShow6, slidesToShow48) => ({
         dots: TroubleshootRounded,
-        infinite: products.length > 1, // Desactivar el comportamiento infinito si solo hay un producto
+        infinite: services.length > 1, // Desactivar el comportamiento infinito si solo hay un producto
         speed: 500,
         slidesToShow: slidesToShow,
         slidesToScroll: 1,
@@ -165,23 +198,38 @@ const CategoryService = ({ category, onDelete, business }) => {
         ]
     });
 
-	useEffect(() => {
+    const filteredServices = services.filter(service => service.category === category.id);
 
-		// setProductsint(products.filter(product => product.category === category.id))
-	 }, [ products]); // Dependencia de useEffect
-
-	return (
-		<div>
-			{/* <h1>{serviceName}</h1>
-			<p>Categoría: {category}</p>
-			<ul>
-				{options.map((option, index) => (
-					<li key={index}>{option}</li>
-				))}
-			</ul> */}
-			ovlbl
-		</div>
-	);
+    return (
+        <Root>
+            <CategoryRow>
+                <CategoryName variant="h6">{category.name}</CategoryName>
+                <div>
+                    <IconButton onClick={handleOpenModal}>
+                        <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => onDelete(category.id)}>
+                        <Delete />
+                    </IconButton>
+                </div>
+            </CategoryRow>
+            <AddButton onClick={handleOpenModal}>Añadir Servicio</AddButton>
+            <Slider {...getSliderSettings(3, 2, 1)}>
+                {filteredServices.map(service => (
+                    <ServiceCatalogo
+                        key={service.id}
+                        service={service}
+                        onDelete={() => handleDeleteService(service.id)}
+                    />
+                ))}
+            </Slider>
+            <Modal open={openModal} onClose={handleCloseModal}>
+                <Box>
+                    <CreateService addService={handleAddService} closeModal={handleCloseModal} />
+                </Box>
+            </Modal>
+        </Root>
+    );
 };
 
 export default CategoryService;

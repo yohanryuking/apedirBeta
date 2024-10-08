@@ -20,7 +20,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 
 const HomeComp = () => {
-  const { userEmail, userId, products, businesses, cayegoryProducts, isAllDataLoaded, cart, users, categoryBusiness, events, posts } = useContext(AppContext);
+  const { userEmail, userId, products, businesses, categoryProducts, isAllDataLoaded, cart, users, categoryBusiness, events, posts } = useContext(AppContext);
   const [selectedProvince, setSelectedProvince] = useState('Todas las provincias');
 
   const [searchResults, setSearchResults] = useState([]);
@@ -71,7 +71,7 @@ const HomeComp = () => {
       console.log(userId)
       console.log(products)
       console.log(businesses)
-      console.log(cayegoryProducts)
+      console.log(categoryProducts)
     }
 
   }, [isAllDataLoaded]);
@@ -130,7 +130,7 @@ const HomeComp = () => {
         event.name.toLowerCase().includes(searchTerm.toLowerCase())
       ).map(event => ({ ...event, type: 'event' }));
 
-      const cayegoryProductResults = cayegoryProducts.filter(cayegoryProduct =>
+      const cayegoryProductResults = categoryProducts.filter(cayegoryProduct =>
         cayegoryProduct.nameProduct.toLowerCase().includes(searchTerm.toLowerCase())
       ).map(cayegoryProduct => ({ ...cayegoryProduct, type: 'categoryProduct' }));
 
@@ -213,7 +213,7 @@ const HomeComp = () => {
 
       <Typography variant="h5">Categorias</Typography>
       <Slider {...getSliderSettings(6, 6, 4)}>
-        {cayegoryProducts.map((category) => (
+        {categoryProducts.map((category) => (
           <div key={category.id}>
             <Category categoryName={category.nameProduct} />
           </div>

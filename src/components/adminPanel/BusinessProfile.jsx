@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../services/client';
-import { Box, Grid, Container, Typography, Avatar, BottomNavigation, BottomNavigationAction, Button } from '@mui/material';
+import { Box, Grid, Container, Typography, Avatar, Menu, MenuItem, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import EventAdmin from './eventos/EventAdmin';
-import logo from '../../assets/images/logoWL.png'
+import logo from '../../assets/images/logoWL.png';
 import Categories from './catalogo/CatalogoComp';
 import NovedadesTab from './novedades/NovedadesTab';
 import BusinessDataAdmin from './negocio/BusinessDataAdmin';
@@ -11,27 +11,10 @@ import LoadingAnimation from '../utils/LoadingAnimation';
 import BusinessDetails from './dashboard/BusinessDetails';
 import { useNavigate } from 'react-router-dom';
 
-
-const StyledBottomNavigation = styled(BottomNavigation)({
-  backgroundColor: '#555',
-  height: '35px',
-});
-
-const StyledBottomNavigationAction = styled(BottomNavigationAction)({
-  color: '#fff',
-  borderTopLeftRadius: '20px',
-  borderTopRightRadius: '20px',
-  padding: '6px 12px',
-  minWidth: '0', // Sobrescribir el min-width
-  '&.Mui-selected': {
-    color: '#555',
-    backgroundColor: '#fff',
-  },
-});
-
 const BusinessProfile = () => {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
   const [business, setBusiness] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,13 +32,17 @@ const BusinessProfile = () => {
     fetchBusiness();
   }, []);
 
-  const handleChange = (event, newValue) => {
-    if (!business) {
-      setValue(null);
-      return;
-    }
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    setValue(newValue);
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenuItemClick = (index) => {
+    setValue(index);
+    setAnchorEl(null);
   };
 
   return (
@@ -68,15 +55,31 @@ const BusinessProfile = () => {
           <Box sx={{ ml: 2 }}>
             <Typography variant="h6">{business?.name}</Typography>
             <Typography variant="body2">Plan Premium</Typography>
+            <Button
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              onClick={handleMenuClick}
+              sx={{ color: '#fff', mt: 1 }}
+            >
+              Menú
+            </Button>
+            <Menu
+              id="simple-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={() => handleMenuItemClick(0)}>Dashboard</MenuItem>
+              <MenuItem onClick={() => handleMenuItemClick(1)}>Negocio</MenuItem>
+              <MenuItem onClick={() => handleMenuItemClick(2)}>Catálogo</MenuItem>
+              <MenuItem onClick={() => handleMenuItemClick(3)}>Eventos</MenuItem>
+              <MenuItem onClick={() => handleMenuItemClick(4)}>Novedades</MenuItem>
+              <MenuItem onClick={() => handleMenuItemClick(5)}>Estadísticas</MenuItem>
+              <MenuItem onClick={() => handleMenuItemClick(6)}>Publicidad</MenuItem>
+            </Menu>
           </Box>
         </Box>
-        <StyledBottomNavigation value={value} onChange={handleChange} showLabels>
-          <StyledBottomNavigationAction label="Dashboard" />
-          <StyledBottomNavigationAction label="Negocio" />
-          <StyledBottomNavigationAction label="Catálogo" />
-          <StyledBottomNavigationAction label="Eventos" />
-          <StyledBottomNavigationAction label="Novedades" />
-        </StyledBottomNavigation>
         <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', marginTop: '20px' }}>
           {business ? (
             <>
@@ -85,6 +88,8 @@ const BusinessProfile = () => {
               <div style={{ display: value === 2 ? 'block' : 'none' }}><Categories business={business} /></div>
               <div style={{ display: value === 3 ? 'block' : 'none' }}><EventAdmin business={business} /></div>
               <div style={{ display: value === 4 ? 'block' : 'none' }}><NovedadesTab business={business} /></div>
+              <div style={{ display: value === 5 ? 'block' : 'none' }}><Typography variant="h6">Estadísticas</Typography></div>
+              <div style={{ display: value === 6 ? 'block' : 'none' }}><Typography variant="h6">Publicidad</Typography></div>
             </>
           ) : (
             <LoadingAnimation />

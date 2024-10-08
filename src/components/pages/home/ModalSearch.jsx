@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 const ModalSearch = () => {
 
-    const { products, businesses, categoryBusiness, cayegoryProducts, events, isAllDataLoaded } = useContext(AppContext)
+    const { products, businesses, categoryBusiness, categoryProducts, events, isAllDataLoaded } = useContext(AppContext)
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
@@ -37,7 +37,7 @@ const ModalSearch = () => {
                 event.name.toLowerCase().includes(searchTerm.toLowerCase())
             ).map(event => ({ ...event, type: 'event' }));
 
-            const cayegoryProductResults = cayegoryProducts.filter(cayegoryProduct =>
+            const cayegoryProductResults = categoryProducts.filter(cayegoryProduct =>
                 cayegoryProduct.nameProduct.toLowerCase().includes(searchTerm.toLowerCase())
             ).map(cayegoryProduct => ({ ...cayegoryProduct, type: 'categoryProduct' }));
 
